@@ -1,0 +1,22 @@
+{
+  "name": "@csm/cli",
+  "version": "1.0.0-alpha.0",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "bin": {
+    "csm": "lib/index.js"
+  },
+  "files": [
+    "/lib/**/*"
+  ],
+  "dependencies": {
+    "@csm/core": "1.0.0-alpha.0",
+    "chalk": "^4.0.0",
+    "figlet": "^1.4.0",
+    "inquirer": "^7.1.0",
+    "yargs": "^15.3.1"
+  },
+  "devDependencies": {
+    "@types/figlet": "^1.2.0"
+  }
+}

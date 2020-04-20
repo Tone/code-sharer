@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "sourceMap": false,
+    "composite": true,
+    "target": "es6",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "allowJs": false,
+    "strict": true,
+    "noUnusedLocals": true,
+    "declaration": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "removeComments": false,
+    "jsx": "preserve",
+    "lib": ["esnext", "dom"],
+    "types": ["jest", "node"]
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.spec.ts",
+    "lib",
+    "fixtures",
+    "examples",
+    "jest.config.js",
+    "**/__test__/**/*"
+  ]
+}

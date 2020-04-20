@@ -1,0 +1,37 @@
+#############
+## 物料约束 ##
+#############
+# 所属仓库
+repository = "vue"
+# 物料类别
+category = "component"
+# 组件名称 默认文件夹名称
+name = ""
+# 组件描述 必须输入
+description = ""
+# 组件作者 默认 Git 用户信息 <name email>
+author = ""
+# 组件标签
+tags = []
+# 插入片段"
+inject = ""
+
+# 包依赖
+[[package]]
+name = "vue"
+version = "^2.6.10"
+
+[[package]]
+name = "ant-design-vue"
+version = "^1.4.12"
+
+# 变量依赖
+[[var]]
+type = "less"
+name = ""
+path = "style/theme.less"
+
+[[var]]
+type = "js"
+name = "api"
+path = "api/index.js"
