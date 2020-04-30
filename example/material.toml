@@ -19,11 +19,11 @@ inject = ""
 # 包依赖
 [[package]]
 name = "vue"
-version = "^2.6.10"
+version = "2.6.10"
 
 [[package]]
 name = "ant-design-vue"
-version = "^1.4.12"
+version = "1.4.12"
 
 # 变量依赖
 [[var]]

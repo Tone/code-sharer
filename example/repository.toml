@@ -9,20 +9,20 @@ style = ""
 ## 执行环境依赖
 [[env]]
 exec = "node"
-version = "^10.0.0"
+version = "10.0.0"
 
 [[env]]
 exec = "npm"
-version = "^4.7.0"
+version = "4.7.0"
 
 ## 包依赖
 [[package]]
 name = "vue"
-version = "^2.6.10"
+version = "2.6.10"
 
 [[package]]
 name = "ant-design-vue"
-version = "^1.4.12"
+version = "1.4.12"
 
 ## 物料类别
 ### 组件

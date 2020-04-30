@@ -72,6 +72,8 @@
 repository = "vue"
 ## 物料文件夹命名风格 默认 name@author[hash]
 style = ""
+## 包管理器执行程序 env 位置 -1 为无包管理器
+manager = -1
 
 ## 执行环境依赖
 [[env]]
