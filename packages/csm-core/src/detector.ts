@@ -4,6 +4,8 @@ import semver from 'semver'
 import { Env, Package } from './config'
 type command = (...args: any) => Promise<any>
 
+let npmPackageCache = ''
+
 // TODO change error interface extends Error
 interface DetectorErr {
   msg: string,
@@ -136,8 +138,14 @@ export default abstract class Detector {
   }
 
   private static async npm(p: string) {
-    const valid = shell.exec(`npm list ${p} --depth=0`, { silent: true }).stdout
-    if (!valid.includes(p)) {
+    if (npmPackageCache === '') {
+      npmPackageCache = shell.exec('npm list --depth=0', { silent: true }).stdout
+    }
+    const regEx = new RegExp(`${p}@.+$`, 'm')
+    const match = npmPackageCache.match(regEx)
+    const valid = match === null ? '' : match[0]
+
+    if (valid === '') {
       const err = {
         msg: `package ${p} does not exist`,
         raw: [p]

@@ -2,6 +2,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import Repository from '../src/repository'
 import Material from '../src/material'
+import { DEFAULT_MATERIAL_CONFIG_NAME } from '../src/constant'
 
 import Storage from '../src/storage'
 
@@ -13,7 +14,7 @@ const testConfigFile = path.resolve(__dirname, '../../../example/material.toml')
 const testConfigObj = { author: '', category: 'component', description: '', name: '', inject: '', package: [{ name: 'vue', version: '2.6.10' }, { name: 'ant-design-vue', version: '1.4.12' }], repository: 'vue', tags: [], var: [{ name: '', path: 'style/theme.less', type: 'less' }, { name: 'api', path: 'api/index.js', type: 'js' }] }
 
 const testDir = path.resolve(__dirname, 'test_storage__')
-const testFile = path.resolve(testDir, 'test_material.toml')
+const testFile = path.resolve(testDir, DEFAULT_MATERIAL_CONFIG_NAME)
 
 const StorageMock = {
   dir: testDir,
@@ -45,8 +46,10 @@ beforeAll(() => {
 
 describe('Material static method should be right', () => {
   test('parse shoule be right', () => {
-    expect(Material.parse(testFile)).toBeNull()
-    expect(Material.parse(testConfigFile)).toEqual(testConfigObj)
+    expect(Material.parse(testDir)).toBeNull()
+    fs.copySync(testConfigFile, testFile)
+    expect(Material.parse(testDir)).toEqual(testConfigObj)
+    fs.removeSync(testFile)
   })
 
   test('init should be right', async () => {

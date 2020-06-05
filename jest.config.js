@@ -9,5 +9,6 @@ module.exports = {
     '^.+\\.(ts|tsx)$': 'ts-jest'
   },
   testMatch: ['**/__test__/**/*.(ts|js)', '**/?(*.)+(spec|test).[jt]s'],
-  testEnvironment: 'node'
+  testEnvironment: 'node',
+  testTimeout: 8000
 }

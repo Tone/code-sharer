@@ -6,7 +6,8 @@
   "scripts": {
     "build": "run-p build:ts doc:html",
     "build:ts": "run-s test tsc",
-    "lint": "eslint \"packages/**/*.{js,ts}\" \"scripts/**/*.{js,ts}\" --quiet --fix",
+    "tsc": "tsc -b",
+    "lint": "eslint \"packages/*/src/**/*.{js,ts}\" \"packages/*/__test__/**/*.{js,ts}\" \"scripts/**/*.{js,ts}\" --quiet --fix",
     "doc": "run-s doc:html && opn build/docs/index.html",
     "doc:html": "typedoc src/ --target ES6 --mode file --out docs",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",

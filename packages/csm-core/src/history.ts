@@ -6,7 +6,7 @@ import fs from 'fs-extra'
 import Repository from './repository'
 import { HISTORY_RECORD_EXT, HISTORY_RECORD_CSV_OPTION } from './constant'
 
-interface RepositoryCSV {
+export interface RepositoryCSV {
   name: string,
   category: string,
   author: string,
@@ -59,6 +59,14 @@ export default class History {
     }))
 
     return records as record[]
+  }
+
+  static transform(record: record): RepositoryCSV {
+    return record.reduce((ac, cu, index) => {
+      const key = recordKey[index]
+      ac[key] = cu
+      return ac
+    }, {} as any)
   }
 
   readonly historyFile: string

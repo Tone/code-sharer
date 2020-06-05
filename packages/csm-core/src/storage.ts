@@ -72,8 +72,12 @@ export default class Storage {
     return this
   }
 
-  async push(remote = REMOTE_NAME, branch = DEFAULT_BRANCH) {
-    await this.repository.push(remote, branch)
+  async push(commitHash?: string, remote = REMOTE_NAME, branch = DEFAULT_BRANCH) {
+    let remoteBranch = branch
+    if (commitHash !== undefined) {
+      remoteBranch = `${commitHash}:${branch}`
+    }
+    await this.repository.push(remote, remoteBranch)
     return this
   }
 

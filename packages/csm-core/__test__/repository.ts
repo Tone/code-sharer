@@ -3,9 +3,11 @@ import fs from 'fs-extra'
 import Repository from '../src/repository'
 import Storage from '../src/storage'
 import History, { recordRow } from '../src/history'
+import Material from '../src/material'
 
 jest.mock('../src/storage')
 jest.mock('../src/history')
+jest.mock('../src/material')
 
 const testConfig = fs.readFileSync(path.resolve(__dirname, '../../../example/repository.toml')
 ).toString()
@@ -40,6 +42,17 @@ const historyInit = jest.fn().mockResolvedValue({
 beforeAll(() => {
   Storage.storage = storage
   History.init = historyInit
+  History.transform = jest.fn().mockReturnValue({
+    name: '1',
+    category: '2',
+    author: '3',
+    commitID: '1',
+    tags: '2',
+    description: '3',
+    dir: '1',
+    ctm: 1,
+    mtm: 2
+  })
 })
 
 beforeEach(() => {
@@ -120,5 +133,22 @@ describe('repository  method  should be right', () => {
     await expect(repository.update()).resolves.not.toThrow()
     expect(StorageMock.fetch).toBeCalledTimes(1)
     expect(StorageMock.checkout).toBeCalledWith([testFile, 'historyFile'])
+  })
+
+  test('find should be right', async () => {
+    const repository = await Repository.init('vue', testConfigObj)
+    repository.searchMaterial = jest.fn().mockResolvedValue([])
+    await expect(repository.find('', '')).resolves.toBe(null)
+    expect(repository.searchMaterial).toBeCalledWith('', '')
+    expect(History.transform).not.toBeCalled()
+
+    repository.searchMaterial = jest.fn().mockResolvedValue([[]])
+    Material.parse = jest.fn().mockReturnValue(null)
+    await expect(repository.find('', '')).resolves.toBe(null)
+    expect(History.transform).toBeCalled()
+    expect(Material.parse).toBeCalledWith('1')
+
+    Material.parse = jest.fn().mockReturnValue({})
+    await expect(repository.find('', '')).resolves.toBeInstanceOf(Material)
   })
 })

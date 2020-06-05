@@ -112,7 +112,9 @@ describe('storage method should be  right', () => {
     await expect(storage.push()).resolves.toBeInstanceOf(StorageMock)
     expect(mockFn.push).toBeCalledWith(REMOTE_NAME, DEFAULT_BRANCH)
     await expect(storage.push('s', 's')).resolves.toBeInstanceOf(StorageMock)
-    expect(mockFn.push).toBeCalledWith('s', 's')
+    expect(mockFn.push).toBeCalledWith('s', 's:master')
+    await expect(storage.push('hash', 'r', 'b')).resolves.toBeInstanceOf(StorageMock)
+    expect(mockFn.push).toBeCalledWith('r', 'hash:b')
   })
   test('config should be right', async () => {
     await expect(storage.config('s')).resolves.toBeUndefined()

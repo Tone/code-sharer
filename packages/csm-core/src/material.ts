@@ -12,7 +12,8 @@ import { recordRow } from './history'
 type nameStyle = Pick<MaterialConfig, 'name' | 'author' | 'category' | 'repository'>;
 
 export default class Material extends Detector {
-  static parse(configPath: string) {
+  static parse(dir: string) {
+    const configPath = path.resolve(dir, DEFAULT_MATERIAL_CONFIG_NAME)
     return new Config<MaterialConfig>(configPath).getConfig()
   }
 
@@ -26,7 +27,7 @@ export default class Material extends Detector {
   }
 
   private readonly repository: Repository
-  private readonly config: MaterialConfig
+  readonly config: MaterialConfig
   private readonly dirName: string
 
   private dir = ''
@@ -167,6 +168,7 @@ export default class Material extends Detector {
     await this.repository.checkEnv()
     await this.checkPackage()
     const dir = await this.getDir()
+    if (!fs.pathExistsSync(dir)) throw new Error(`${dir} does not exists`)
     await fs.copy(dir, srcDir)
   }
 }

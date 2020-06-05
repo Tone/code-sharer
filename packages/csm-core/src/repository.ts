@@ -6,6 +6,7 @@ import Config, { RepositoryConfig } from './config'
 import { CONFIG_EXT } from './constant'
 import Storage from './storage'
 import History, { recordRow } from './history'
+import Material from './material'
 
 interface RepositoryList {
   repository: {
@@ -118,9 +119,18 @@ export default class Repository extends Detector {
     return await storage.commit([historyFile], this.message())
   }
 
-  async searchMaterial(name: string, category: string) {
+  async searchMaterial(name: string, category?: string) {
     const history = await this.history
     return history.search({ name, category })
+  }
+
+  async find(name: string, category: string) {
+    const materials = await this.searchMaterial(name, category)
+    if (materials.length === 0) return null
+    const materialInfo = History.transform(materials[0])
+    const config = Material.parse(materialInfo.dir)
+    if (config === null) return null
+    return new Material(this, config)
   }
 
   async update() {
