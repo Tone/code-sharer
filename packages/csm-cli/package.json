@@ -13,10 +13,15 @@
     "@csm/core": "1.0.0-alpha.0",
     "chalk": "^4.0.0",
     "figlet": "^1.4.0",
+    "fs-extra": "^9.0.0",
     "inquirer": "^7.1.0",
+    "inquirer-autocomplete-prompt": "^1.0.2",
+    "ora": "^4.0.4",
     "yargs": "^15.3.1"
   },
   "devDependencies": {
-    "@types/figlet": "^1.2.0"
+    "@types/figlet": "^1.2.0",
+    "@types/fs-extra": "^9.0.1",
+    "@types/inquirer": "^6.5.0"
   }
 }
