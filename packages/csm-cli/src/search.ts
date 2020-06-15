@@ -46,6 +46,8 @@ export async function handler(args: Arguments) {
 
 async function searchAllRepository(name: string, categoryName?: string) {
   const repositories = Object.values(Repository.repositoryList().repository)
+  if (repositories.length === 0) throw new Err('No repository exist')
+
   const spinner = ora('Searching...').start()
 
   const progress = repositories.map(async repository => {
@@ -54,6 +56,9 @@ async function searchAllRepository(name: string, categoryName?: string) {
   })
 
   const result = await Promise.all(progress)
+  spinner.succeed('Done')
+
+  if (result.flat().length === 0) throw new Err('No results in all repository')
 
   result.forEach((repo, index) => {
     const repositoryName: string = repositories[index].getConfig().repository
@@ -66,8 +71,6 @@ async function searchAllRepository(name: string, categoryName?: string) {
       console.log(`${chalk.green(name)} in repository ${repositoryName} category ${category} by ${author}`)
     })
   })
-
-  spinner.succeed('Done')
 }
 
 async function searchInRepository(name: string, repositoryName: string, categoryName?: string) {
@@ -76,6 +79,7 @@ async function searchInRepository(name: string, repositoryName: string, category
   const spinner = ora(`Searching ${name} in repository ${repositoryName}`).start()
   const result = await repository.searchMaterial(name, categoryName)
   spinner.succeed('Done')
+  if (result.length === 0) throw new Err(`No results in ${repositoryName}`)
 
   result.forEach(r => {
     const record = History.transform(r)

@@ -86,8 +86,9 @@ async function interactive(name: string, target?: string) {
 }
 
 async function pick(name: string, repository: Repository, categoryName: string, target?: string) {
-  const category = repository.getConfig().category[categoryName]
-  const repositoryName = repository.getConfig().repository
+  const repositoryConfig = repository.getConfig()
+  const category = repositoryConfig.category[categoryName]
+  const repositoryName = repositoryConfig.repository
 
   let targetDir = target ?? category.position
   targetDir = path.isAbsolute(targetDir) ? targetDir : path.resolve(process.cwd(), targetDir)

@@ -21,27 +21,33 @@ export async function handler(args: Arguments) {
   const name = args.name as string | undefined
 
   if (name === undefined) {
-    const repositories = Repository.repositoryList()
-    const spinner = ora('Updating...').start()
-
-    const progress = Object.values(repositories.repository).map(async repository => {
-      spinner.text = `Updating ${repository.getConfig().repository}`
-      return await repository.update()
-    })
-
-    await Promise.all(progress)
-    spinner.succeed('Done')
+    await updateAllRepository()
     return
   }
 
-  await update(name)
+  await updatebyRepositoryName(name)
 }
 
-async function update(name: string) {
+async function updatebyRepositoryName(name: string) {
   const repository = Repository.find(name)
   if (repository === null) throw new Err(`repository ${name} does not does not exist`)
-  const spinner = ora(`Updating ${name}`).start()
+  const spinner = ora(`Updating  repository ${name}...`).start()
   await repository.update()
+  spinner.succeed('Done')
+}
+
+async function updateAllRepository() {
+  const repositories = Repository.repositoryList()
+  if (repositories.size === 0) throw new Err('No repository exist')
+
+  const spinner = ora('Updating...').start()
+
+  const progress = Object.values(repositories.repository).map(async repository => {
+    spinner.text = `Updating  repository ${repository.getConfig().repository}...`
+    return await repository.update()
+  })
+
+  await Promise.all(progress)
   spinner.succeed('Done')
 }
 

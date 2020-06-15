@@ -47,7 +47,7 @@ export async function handler(args: Arguments) {
   }
 }
 
-async function interactive(name: string) {
+async function interactive(name?: string) {
   const { size, repository } = Repository.repositoryList()
 
   if (size === 0) {

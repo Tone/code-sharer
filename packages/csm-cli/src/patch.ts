@@ -41,7 +41,7 @@ export function builder(argv: Argv) {
 export async function handler(args: Arguments) {
   await check()
   const name = args.name as string
-  const dir = args.name as string | undefined
+  const dir = args.dir as string | undefined
   const repositoryName = args.repository as string | undefined
   const category = args.category as string | undefined
 

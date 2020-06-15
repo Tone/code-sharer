@@ -5,7 +5,7 @@ import { CONF_FILE } from './config'
 
 class Init implements CommandModule {
   readonly command = 'init'
-  readonly describe = 'init local storage'
+  readonly describe = 'Init local storage'
   builder(argv: Argv) {
     argv.positional('[storageDir]', {
       describe: 'local storage dir',
