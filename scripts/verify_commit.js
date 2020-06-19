@@ -19,8 +19,7 @@ if (!commitRE.test(msg)) {
       `    ${chalk.green('feat(compiler): add "comments" option')}\n` +
       `    ${chalk.green(
         'fix(v-model): handle events on blur (close #28)'
-      )}\n\n` +
-      chalk.red('  See .github/commit-convention.md for more details.\n')
+      )}\n\n`
   )
   process.exit(1)
 }
