@@ -4,11 +4,11 @@ import check from './check'
 import Err from './err'
 import ora from 'ora'
 
-export const command = 'update'
+export const command = 'update [name]'
 export const describe = 'Update repository'
 
 export function builder(argv: Argv) {
-  argv.positional('[name]', {
+  argv.positional('name', {
     describe: 'repository name',
     type: 'string'
   })
@@ -25,12 +25,14 @@ export async function handler(args: Arguments) {
     return
   }
 
-  await updatebyRepositoryName(name)
+  await updateByRepositoryName(name)
 }
 
-async function updatebyRepositoryName(name: string) {
+async function updateByRepositoryName(name: string) {
   const repository = Repository.find(name)
-  if (repository === null) throw new Err(`repository ${name} does not does not exist`)
+  if (repository === null) {
+    throw new Err(`repository ${name} does not does not exist`)
+  }
   const spinner = ora(`Updating  repository ${name}...`).start()
   await repository.update()
   spinner.succeed('Done')
@@ -42,10 +44,14 @@ async function updateAllRepository() {
 
   const spinner = ora('Updating...').start()
 
-  const progress = Object.values(repositories.repository).map(async repository => {
-    spinner.text = `Updating  repository ${repository.getConfig().repository}...`
-    return await repository.update()
-  })
+  const progress = Object.values(repositories.repository).map(
+    async (repository) => {
+      spinner.text = `Updating  repository ${
+        repository.getConfig().repository
+      }...`
+      return await repository.update()
+    }
+  )
 
   await Promise.all(progress)
   spinner.succeed('Done')

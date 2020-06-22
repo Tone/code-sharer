@@ -6,16 +6,16 @@ import inquirer, { QuestionCollection, Answers } from 'inquirer'
 import path from 'path'
 import fs from 'fs-extra'
 
-export const command = 'patch'
+export const command = 'patch <name> [dir]'
 export const describe = 'Patch material'
 
 export function builder(argv: Argv) {
-  argv.positional('<name>', {
+  argv.positional('name', {
     describe: 'material name',
     type: 'string'
   })
 
-  argv.positional('[dir]', {
+  argv.positional('dir', {
     describe: 'Patch file dir',
     type: 'string'
   })
@@ -49,7 +49,9 @@ export async function handler(args: Arguments) {
   if (dir !== undefined) {
     srcDir = path.resolve(srcDir, dir)
   }
-  if (!fs.pathExistsSync(srcDir)) throw new Err(`Patch dir ${srcDir} does not exists`)
+  if (!fs.pathExistsSync(srcDir)) {
+    throw new Err(`Patch dir ${srcDir} does not exists`)
+  }
 
   if (repositoryName !== undefined && category !== undefined) {
     await initiative(name, repositoryName, category, srcDir)
@@ -71,16 +73,21 @@ async function interactive(name: string, dir: string) {
       name: 'repositoryName',
       message: 'Choose repository',
       source: async (_: Answers, input: string) => {
-        return Object.keys(repository).filter(repositoryName => repositoryName.includes(input))
+        return Object.keys(repository).filter((repositoryName) =>
+          repositoryName.includes(input)
+        )
       }
-    }, {
+    },
+    {
       type: 'autocomplete',
       name: 'category',
       message: 'Choose category',
       source: async (answer: Answers, input: string) => {
         const repositoryName = answer.repositoryName as string
         const repo = repository[repositoryName]
-        return Object.keys(repo.getConfig().category).filter(c => c.includes(input))
+        return Object.keys(repo.getConfig().category).filter((c) =>
+          c.includes(input)
+        )
       }
     }
   ]
@@ -92,24 +99,43 @@ async function interactive(name: string, dir: string) {
   await submit(name, dir, repository[inputRepository], inputCategory)
 }
 
-async function initiative(name: string, repositoryName: string, categoryName: string, srcDir: string) {
+async function initiative(
+  name: string,
+  repositoryName: string,
+  categoryName: string,
+  srcDir: string
+) {
   const repository = Repository.find(repositoryName)
-  if (repository === null) throw new Err(`repository ${repositoryName} does not does not exist`)
+  if (repository === null) {
+    throw new Err(`repository ${repositoryName} does not does not exist`)
+  }
 
   await submit(name, srcDir, repository, categoryName)
 }
 
-async function submit(name: string, srcDir: string, repository: Repository, categoryName: string) {
+async function submit(
+  name: string,
+  srcDir: string,
+  repository: Repository,
+  categoryName: string
+) {
   const repositoryName = repository.getConfig().repository
   const material = await repository.find(name, categoryName)
-  if (material === null) throw new Err(`No material ${name} was found in repository ${repositoryName}`)
+  if (material === null) {
+    throw new Err(
+      `No material ${name} was found in repository ${repositoryName}`
+    )
+  }
 
   const localAuthor = await Storage.storage().author()
   const author: string = material.config.author
   const materialName: string = material.config.name
 
-  if (localAuthor !== author) throw new Err(`Material ${materialName} author is ${author}, but local is ${localAuthor}`)
-
+  if (localAuthor !== author) {
+    throw new Err(
+      `Material ${materialName} author is ${author}, but local is ${localAuthor}`
+    )
+  }
   await material.submit(srcDir)
 }
 

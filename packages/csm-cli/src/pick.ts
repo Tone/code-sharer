@@ -6,16 +6,16 @@ import inquirer, { QuestionCollection, Answers } from 'inquirer'
 import path from 'path'
 import fs from 'fs-extra'
 
-export const command = 'pick'
+export const command = 'pick <name> [target]'
 export const describe = 'Pick materials to project'
 
 export function builder(argv: Argv) {
-  argv.positional('<name>', {
+  argv.positional('name', {
     describe: 'material name',
     type: 'string'
   })
 
-  argv.positional('[target]', {
+  argv.positional('target', {
     describe: 'target dir',
     type: 'string'
   })
@@ -65,16 +65,21 @@ async function interactive(name: string, target?: string) {
       name: 'repositoryName',
       message: 'Choose repository',
       source: async (_: Answers, input: string) => {
-        return Object.keys(repository).filter(repositoryName => repositoryName.includes(input))
+        return Object.keys(repository).filter((repositoryName) =>
+          repositoryName.includes(input)
+        )
       }
-    }, {
+    },
+    {
       type: 'autocomplete',
       name: 'category',
       message: 'Choose category',
       source: async (answer: Answers, input: string) => {
         const repositoryName = answer.repositoryName as string
         const repo = repository[repositoryName]
-        return Object.keys(repo.getConfig().category).filter(c => c.includes(input))
+        return Object.keys(repo.getConfig().category).filter((c) =>
+          c.includes(input)
+        )
       }
     }
   ]
@@ -85,16 +90,27 @@ async function interactive(name: string, target?: string) {
   await pick(name, repository[repositoryName], categoryName, target)
 }
 
-async function pick(name: string, repository: Repository, categoryName: string, target?: string) {
+async function pick(
+  name: string,
+  repository: Repository,
+  categoryName: string,
+  target?: string
+) {
   const repositoryConfig = repository.getConfig()
   const category = repositoryConfig.category[categoryName]
   const repositoryName = repositoryConfig.repository
 
   let targetDir = target ?? category.position
-  targetDir = path.isAbsolute(targetDir) ? targetDir : path.resolve(process.cwd(), targetDir)
+  targetDir = path.isAbsolute(targetDir)
+    ? targetDir
+    : path.resolve(process.cwd(), targetDir)
 
   const material = await repository.find(name, categoryName)
-  if (material === null) throw new Err(`No material ${name} was found in repository ${repositoryName}`)
+  if (material === null) {
+    throw new Err(
+      `No material ${name} was found in repository ${repositoryName}`
+    )
+  }
 
   const dir = await material.getDir()
   if (!fs.pathExistsSync(dir)) {
@@ -103,9 +119,16 @@ async function pick(name: string, repository: Repository, categoryName: string, 
   await material.pick(targetDir)
 }
 
-async function initiative(name: string, repositoryName: string, categoryName: string, target?: string) {
+async function initiative(
+  name: string,
+  repositoryName: string,
+  categoryName: string,
+  target?: string
+) {
   const repository = Repository.find(repositoryName)
-  if (repository === null) throw new Err(`repository ${repositoryName} does not does not exist`)
+  if (repository === null) {
+    throw new Err(`repository ${repositoryName} does not does not exist`)
+  }
   await pick(name, repository, categoryName, target)
 }
 

@@ -4,10 +4,10 @@ import fs from 'fs-extra'
 import { CONF_FILE } from './config'
 
 class Init implements CommandModule {
-  readonly command = 'init'
+  readonly command = 'init [storageDir]'
   readonly describe = 'Init local storage'
   builder(argv: Argv) {
-    argv.positional('[storageDir]', {
+    argv.positional('storageDir', {
       describe: 'local storage dir',
       type: 'string'
     })

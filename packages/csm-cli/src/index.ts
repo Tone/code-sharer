@@ -36,14 +36,11 @@ const argv = yargs
     if (err instanceof CliErr) {
       console.log(chalk.bgRedBright(err.message))
       return
-    } else if (err !== undefined) {
-      throw err
     }
     console.error('You broke it!')
-    console.error(msg)
+    console.error(msg ?? err)
     console.error('You should be doing', yargs.help())
     process.exit(1)
-  })
-  .argv
+  }).argv
 
 export default argv

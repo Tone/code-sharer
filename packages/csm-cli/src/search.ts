@@ -5,11 +5,11 @@ import Err from './err'
 import ora from 'ora'
 import chalk from 'chalk'
 
-export const command = 'search'
+export const command = 'search <name>'
 export const describe = 'Search material'
 
 export function builder(argv: Argv) {
-  argv.positional('<name>', {
+  argv.positional('name', {
     describe: 'material name',
     type: 'string'
   })
@@ -49,8 +49,7 @@ async function searchAllRepository(name: string, categoryName?: string) {
   if (repositories.length === 0) throw new Err('No repository exist')
 
   const spinner = ora('Searching...').start()
-
-  const progress = repositories.map(async repository => {
+  const progress = repositories.map(async (repository) => {
     spinner.text = `Searching ${repository.getConfig().repository}`
     return await repository.searchMaterial(name, categoryName)
   })
@@ -62,26 +61,38 @@ async function searchAllRepository(name: string, categoryName?: string) {
 
   result.forEach((repo, index) => {
     const repositoryName: string = repositories[index].getConfig().repository
-    repo.forEach(r => {
+    repo.forEach((r) => {
       const record = History.transform(r)
       const name: string = record.name
       const category: string = record.category
       const author: string = record.author
 
-      console.log(`${chalk.green(name)} in repository ${repositoryName} category ${category} by ${author}`)
+      console.log(
+        `${chalk.green(
+          name
+        )} in repository ${repositoryName} category ${category} by ${author}`
+      )
     })
   })
 }
 
-async function searchInRepository(name: string, repositoryName: string, categoryName?: string) {
+async function searchInRepository(
+  name: string,
+  repositoryName: string,
+  categoryName?: string
+) {
   const repository = Repository.find(repositoryName)
-  if (repository === null) throw new Err(`repository ${repositoryName} does not does not exist`)
-  const spinner = ora(`Searching ${name} in repository ${repositoryName}`).start()
+  if (repository === null) {
+    throw new Err(`repository ${repositoryName} does not does not exist`)
+  }
+  const spinner = ora(
+    `Searching ${name} in repository ${repositoryName}`
+  ).start()
   const result = await repository.searchMaterial(name, categoryName)
   spinner.succeed('Done')
   if (result.length === 0) throw new Err(`No results in ${repositoryName}`)
 
-  result.forEach(r => {
+  result.forEach((r) => {
     const record = History.transform(r)
     const name: string = record.name
     const category: string = record.category

@@ -4,11 +4,11 @@ import check from './check'
 import Err from './err'
 import inquirer, { QuestionCollection, Answers } from 'inquirer'
 
-export const command = 'publish'
+export const command = 'publish [name]'
 export const describe = 'Publish material to repository'
 
 export function builder(argv: Argv) {
-  argv.positional('[name]', {
+  argv.positional('name', {
     describe: 'material name',
     type: 'string'
   })
@@ -60,26 +60,31 @@ async function interactive(name?: string) {
       name: 'repositoryName',
       message: 'Choose repository',
       source: async (_: Answers, input: string) => {
-        return Object.keys(repository).filter(repositoryName => repositoryName.includes(input))
+        return Object.keys(repository).filter((repositoryName) =>
+          repositoryName.includes(input)
+        )
       }
-    }, {
+    },
+    {
       type: 'autocomplete',
       name: 'category',
       message: 'Choose category',
       source: async (answer: Answers, input: string) => {
         const repositoryName = answer.repositoryName as string
         const repo = repository[repositoryName]
-        return Object.keys(repo.getConfig().category).filter(c => c.includes(input))
+        return Object.keys(repo.getConfig().category).filter((c) =>
+          c.includes(input)
+        )
       }
-    }, {
+    },
+    {
       type: 'input',
       name: 'name',
       default: name,
       message: 'Material name',
-      validate: async (answers: Answers) => {
+      validate: async (name: string, answers: Answers) => {
         const repositoryName = answers.repositoryName as string
         const categoryName = answers.category as string
-        const name = answers.name as string
         const repo = repository[repositoryName]
         const record = await repo.searchMaterial(name, categoryName)
         if (record.length !== 0) return true
@@ -96,18 +101,32 @@ async function interactive(name?: string) {
   await publish(repository[inputRepository], inputCategory, inputName)
 }
 
-async function initiative(repositoryName: string, categoryName: string, name: string) {
+async function initiative(
+  repositoryName: string,
+  categoryName: string,
+  name: string
+) {
   const repository = Repository.find(repositoryName)
-  if (repository === null) throw new Err(`repository ${repositoryName} does not does not exist`)
+  if (repository === null) {
+    throw new Err(`repository ${repositoryName} does not does not exist`)
+  }
 
   await publish(repository, categoryName, name)
 }
 
-async function publish(repository: Repository, categoryName: string, name: string) {
+async function publish(
+  repository: Repository,
+  categoryName: string,
+  name: string
+) {
   const repositoryName = repository.getConfig().repository
   const record = await repository.searchMaterial(name, categoryName)
 
-  if (record.length === 0) throw new Err(`No material ${name} was found in repository ${repositoryName}`)
+  if (record.length === 0) {
+    throw new Err(
+      `No material ${name} was found in repository ${repositoryName}`
+    )
+  }
 
   const commitHash = History.transform(record[0]).commitID
   await Storage.storage().push(commitHash)
