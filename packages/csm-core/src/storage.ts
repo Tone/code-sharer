@@ -1,7 +1,11 @@
 import Git, { SimpleGit } from 'simple-git/promise'
 import fs from 'fs-extra'
 
-import { DEFAULT_REPOSITORY_PATH, REMOTE_NAME, DEFAULT_BRANCH } from './constant'
+import {
+  DEFAULT_REPOSITORY_PATH,
+  REMOTE_NAME,
+  DEFAULT_BRANCH
+} from './constant'
 
 export default class Storage {
   static async clone(url: string, dir = DEFAULT_REPOSITORY_PATH) {
@@ -14,7 +18,7 @@ export default class Storage {
   static async discover(dir = DEFAULT_REPOSITORY_PATH) {
     await fs.ensureDir(dir)
     const repository = Git(dir)
-    if (!await repository.checkIsRepo()) {
+    if (!(await repository.checkIsRepo())) {
       await repository.init()
     }
 
@@ -22,7 +26,10 @@ export default class Storage {
   }
 
   static async init(dir = DEFAULT_REPOSITORY_PATH, url?: string) {
-    this.storageCache = url !== undefined ? await Storage.clone(url, dir) : await Storage.discover(dir)
+    this.storageCache =
+      url !== undefined
+        ? await Storage.clone(url, dir)
+        : await Storage.discover(dir)
     return this.storageCache
   }
 
@@ -31,7 +38,7 @@ export default class Storage {
       throw new Error(`${dir} does not exist, please run init first `)
     }
     const repository = Git(dir)
-    if (!await repository.checkIsRepo()) {
+    if (!(await repository.checkIsRepo())) {
       throw new Error('Storage does not init, please run init first ')
     }
   }
@@ -53,9 +60,11 @@ export default class Storage {
 
   async commit(files: string[], message: string) {
     await this.repository.add(files)
-    await this.repository.commit(files, message)
-    const commitId = await this.repository.show(['-s', '--format=%H'])
-    return commitId
+    const commitInfo = await this.repository.commit(message, files)
+    if (commitInfo === null) {
+      throw new Error('commit error, please check if git config is correct')
+    }
+    return commitInfo.commit
   }
 
   async fetch(remote = REMOTE_NAME) {
@@ -63,7 +72,11 @@ export default class Storage {
     return this
   }
 
-  async checkout(files: string[], remote = REMOTE_NAME, branch = DEFAULT_BRANCH) {
+  async checkout(
+    files: string[],
+    remote = REMOTE_NAME,
+    branch = DEFAULT_BRANCH
+  ) {
     let remoteBranch = `${remote}/${branch}`
     if (remote === '' || branch === '') {
       remoteBranch = `${REMOTE_NAME}/${DEFAULT_BRANCH}`
@@ -72,11 +85,17 @@ export default class Storage {
     return this
   }
 
-  async push(commitHash?: string, remote = REMOTE_NAME, branch = DEFAULT_BRANCH) {
+  async push(
+    commitHash?: string,
+    remote = REMOTE_NAME,
+    branch = DEFAULT_BRANCH
+  ) {
     let remoteBranch = branch
     if (commitHash !== undefined) {
-      remoteBranch = `${commitHash}:${branch}`
+      const nextHash = await this.nextCommit(commitHash)
+      remoteBranch = `${nextHash}:${branch}`
     }
+    await this.repository.pull(remote, branch, ['-r'])
     await this.repository.push(remote, remoteBranch)
     return this
   }
@@ -87,10 +106,22 @@ export default class Storage {
   }
 
   async author() {
-    const [name, email] = await Promise.all([this.config('name'), this.config('email')])
+    const [name, email] = await Promise.all([
+      this.config('user.name'),
+      this.config('user.email')
+    ])
     if (typeof name === 'string' && typeof email === 'string') {
       return `${name} <${email}>`
     }
     return ''
+  }
+
+  private async nextCommit(cur: string) {
+    const info = await this.repository.log([
+      '--reverse',
+      '--ancestry-path',
+      `${cur}^..HEAD`
+    ])
+    return info.all[1].hash
   }
 }

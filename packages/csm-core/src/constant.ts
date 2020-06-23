@@ -21,3 +21,5 @@ export const HISTORY_RECORD_EXT = '.csv'
 export const HISTORY_RECORD_CSV_OPTION = {
   delimiter: '|'
 }
+
+export const SOURCE_DIR = 'src'

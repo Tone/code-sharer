@@ -5,11 +5,18 @@ import Config, { MaterialConfig } from './config'
 import Detector, { DetectorType } from './detector'
 import Repository from './repository'
 import Storage from './storage'
-import { DEFAULT_NAME_STYLE, DEFAULT_MATERIAL_CONFIG_NAME } from './constant'
-import { stringify } from './utils'
+import {
+  DEFAULT_NAME_STYLE,
+  DEFAULT_MATERIAL_CONFIG_NAME,
+  SOURCE_DIR
+} from './constant'
+import { stringify, allFiles } from './utils'
 import { recordRow } from './history'
 
-type nameStyle = Pick<MaterialConfig, 'name' | 'author' | 'category' | 'repository'>;
+type nameStyle = Pick<
+  MaterialConfig,
+  'name' | 'author' | 'category' | 'repository'
+>
 
 export default class Material extends Detector {
   static parse(dir: string) {
@@ -51,7 +58,9 @@ export default class Material extends Detector {
     const { category } = this.config
     const { category: categories, repository } = this.repository.getConfig()
     if (categories[category] === undefined) {
-      throw new Error(`category ${category} does not exist in repository ${repository}`)
+      throw new Error(
+        `category ${category} does not exist in repository ${repository}`
+      )
     }
 
     const { dir } = categories[category]
@@ -62,17 +71,24 @@ export default class Material extends Detector {
     const { category } = this.config
     const { category: categories, repository } = this.repository.getConfig()
     if (categories[category] === undefined) {
-      throw new Error(`category ${category} does not exist in repository ${repository}`)
+      throw new Error(
+        `category ${category} does not exist in repository ${repository}`
+      )
     }
     const { checklist } = categories[category]
     if (checklist === undefined) return
-    return await this.getDetectorByType(DetectorType.checklist)(checklist, this.config)
+    return await this.getDetectorByType(DetectorType.checklist)(
+      checklist,
+      this.config
+    )
   }
 
   async checkPackage() {
     await this.repository.checkPackage()
     if (this.config.package === undefined) return
-    return await this.getDetectorByType(DetectorType.package)(this.config.package)
+    return await this.getDetectorByType(DetectorType.package)(
+      this.config.package
+    )
   }
 
   private getSrcFileDir(files: string[]) {
@@ -84,7 +100,10 @@ export default class Material extends Detector {
 
   private getDirName() {
     const style = this.repository.getConfig().style ?? DEFAULT_NAME_STYLE
-    const dirName = stringify(style, this.config as nameStyle)
+    const dirName = stringify(
+      style === '' ? DEFAULT_NAME_STYLE : style,
+      this.config as nameStyle
+    )
     return dirName
   }
 
@@ -135,11 +154,14 @@ export default class Material extends Detector {
 
   async submit(srcDir: string) {
     const dir = await this.getDir()
-    const relativeFiles = await (await fs.readdir(srcDir)).map(f => path.relative(srcDir, f))
+    const relativeFiles = await (await fs.readdir(srcDir)).map((f) =>
+      path.relative(srcDir, f)
+    )
     await this.submitCheck(relativeFiles)
-    await fs.copy(srcDir, dir)
+    await fs.copy(srcDir, path.join(dir, SOURCE_DIR))
     await this.genConfig()
-    const files = await fs.readdir(dir)
+
+    const files = allFiles(dir)
     await this.record(files)
   }
 
@@ -151,7 +173,7 @@ export default class Material extends Detector {
 
     files.forEach((file) => {
       const relativeFile = path.relative(srcFileDir, file)
-      const dirFile = path.resolve(dir, relativeFile)
+      const dirFile = path.join(dir, SOURCE_DIR, relativeFile)
       relativeFiles.push(relativeFile)
       dirFiles.push(dirFile)
     })
@@ -164,11 +186,12 @@ export default class Material extends Detector {
     await this.record([...dirFiles, configPath])
   }
 
-  async pick(srcDir: string) {
+  async pick(targetDir: string) {
     await this.repository.checkEnv()
     await this.checkPackage()
     const dir = await this.getDir()
     if (!fs.pathExistsSync(dir)) throw new Error(`${dir} does not exists`)
-    await fs.copy(dir, srcDir)
+    const srcDir = path.join(dir, SOURCE_DIR)
+    await fs.copy(srcDir, targetDir)
   }
 }

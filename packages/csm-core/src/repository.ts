@@ -18,7 +18,9 @@ interface RepositoryList {
 export default class Repository extends Detector {
   private static configList(dir: string): string[] {
     const files = fs.readdirSync(dir)
-    const configFile = files.filter((file) => path.extname(file) === CONFIG_EXT).map(f => path.resolve(dir, f))
+    const configFile = files
+      .filter((file) => path.extname(file) === CONFIG_EXT)
+      .map((f) => path.resolve(dir, f))
     return configFile
   }
 
@@ -34,9 +36,7 @@ export default class Repository extends Detector {
         (repositories: RepositoryList['repository'], configFile) => {
           const repository = new Repository(configFile)
           const repositoryName = repository.repositoryName
-
           repositories[repositoryName] = repository
-
           return repositories
         },
         {}
@@ -59,10 +59,9 @@ export default class Repository extends Detector {
   }
 
   static find(name: string) {
-    const { dir } = Storage.storage()
-    const repositoryFile = path.resolve(dir, `${name}${CONFIG_EXT}`)
-    if (fs.pathExistsSync(repositoryFile)) {
-      return new Repository(repositoryFile)
+    const { repository } = this.repositoryList()
+    if (repository[name] !== undefined) {
+      return repository[name]
     }
     return null
   }
@@ -78,7 +77,9 @@ export default class Repository extends Detector {
     const config = new Config<RepositoryConfig>(configFile).getConfig()
 
     if (config === null) {
-      throw (new Error(`repository config ${configFile} does not exist, Please init first`))
+      throw new Error(
+        `repository config ${configFile} does not exist, Please init first`
+      )
     }
 
     const repositoryName = config.repository
@@ -100,7 +101,9 @@ export default class Repository extends Detector {
 
   async checkPackage() {
     if (this.config.package === undefined) return
-    return await this.getDetectorByType(DetectorType.package)(this.config.package)
+    return await this.getDetectorByType(DetectorType.package)(
+      this.config.package
+    )
   }
 
   async record(record: recordRow) {
@@ -121,14 +124,20 @@ export default class Repository extends Detector {
 
   async searchMaterial(name: string, category?: string) {
     const history = await this.history
-    return history.search({ name, category })
+    const condition = category !== undefined ? { name, category } : { name }
+    return history.search(condition)
   }
 
   async find(name: string, category: string) {
     const materials = await this.searchMaterial(name, category)
     if (materials.length === 0) return null
     const materialInfo = History.transform(materials[0])
-    const config = Material.parse(materialInfo.dir)
+    const materialDir = path.resolve(
+      Storage.storage().dir,
+      this.config.repository,
+      materialInfo.dir
+    )
+    const config = Material.parse(materialDir)
     if (config === null) return null
     return new Material(this, config)
   }

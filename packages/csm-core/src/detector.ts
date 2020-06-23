@@ -8,7 +8,7 @@ let npmPackageCache = ''
 
 // TODO change error interface extends Error
 interface DetectorErr {
-  msg: string,
+  msg: string
   raw: string[]
 }
 
@@ -51,7 +51,9 @@ export default abstract class Detector {
   private static async env(env: Env[]) {
     const valid = []
     for (const e of env) {
-      const { code, stdout: version } = shell.exec(`${e.exec} --version`, { silent: true })
+      const { code, stdout: version } = shell.exec(`${e.exec} --version`, {
+        silent: true
+      })
       if (code !== 0) {
         const err: DetectorErr = {
           msg: `env ${e.exec} does not exist`,
@@ -139,9 +141,10 @@ export default abstract class Detector {
 
   private static async npm(p: string) {
     if (npmPackageCache === '') {
-      npmPackageCache = shell.exec('npm list --depth=0', { silent: true }).stdout
+      npmPackageCache = shell.exec('npm list --depth=0', { silent: true })
+        .stdout
     }
-    const regEx = new RegExp(`${p}@.+$`, 'm')
+    const regEx = new RegExp(`(?<=\\s)${p}@.+$`, 'm')
     const match = npmPackageCache.match(regEx)
     const valid = match === null ? '' : match[0]
 
@@ -156,7 +159,10 @@ export default abstract class Detector {
     return await Promise.resolve(version[version.length - 1])
   }
 
-  private static async version(exist: string, expect: string): Promise<boolean> {
+  private static async version(
+    exist: string,
+    expect: string
+  ): Promise<boolean> {
     const existV = semver.coerce(exist)
     const expectV = semver.coerce(expect)
     let valid = true
@@ -178,7 +184,8 @@ export default abstract class Detector {
     } else if (typeof detector === 'function') {
       return detector
     } else if (typeof this.detector[detector[1]] === 'function') {
-      return async (...arg: any) => await detector[0](...arg, this.detector[detector[1]])
+      return async (...arg: any) =>
+        await detector[0](...arg, this.detector[detector[1]])
     }
     return detector[0]
   }
