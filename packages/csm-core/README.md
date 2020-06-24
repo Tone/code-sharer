@@ -1,1 +1,1 @@
-## @csm/core
+## @tone/csm-core

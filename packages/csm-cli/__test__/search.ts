@@ -1,17 +1,19 @@
 import yargs from 'yargs'
 
-import { Repository, History } from '@csm/core'
+import { Repository, History } from '@tone/csm-core'
 import search from '../src/search'
 import check from '../src/check'
 
 jest.spyOn(console, 'log').mockImplementation()
 
-jest.mock('@csm/core')
+jest.mock('@tone/csm-core')
 jest.mock('../src/check', () => jest.fn().mockResolvedValue(true))
-jest.mock('ora', () => jest.fn().mockReturnValue({
-  start: jest.fn().mockReturnValue({ succeed: jest.fn() }),
-  stop: jest.fn()
-}))
+jest.mock('ora', () =>
+  jest.fn().mockReturnValue({
+    start: jest.fn().mockReturnValue({ succeed: jest.fn() }),
+    stop: jest.fn()
+  })
+)
 
 const repositoryConfig = {
   repository: 'test'
@@ -22,13 +24,19 @@ const repository = {
   searchMaterial: jest.fn().mockResolvedValue([['test']])
 }
 
-Repository.repositoryList = jest.fn().mockReturnValueOnce({ size: 0, repository: {} }).mockReturnValue({
-  size: 1,
-  repository: {
-    test: repository
-  }
-})
-Repository.find = jest.fn().mockReturnValueOnce(null).mockReturnValue(repository)
+Repository.repositoryList = jest
+  .fn()
+  .mockReturnValueOnce({ size: 0, repository: {} })
+  .mockReturnValue({
+    size: 1,
+    repository: {
+      test: repository
+    }
+  })
+Repository.find = jest
+  .fn()
+  .mockReturnValueOnce(null)
+  .mockReturnValue(repository)
 
 History.transform = jest.fn().mockReturnValue({})
 
@@ -43,7 +51,9 @@ describe('command search should be right', () => {
     expect(Repository.repositoryList).toBeCalledTimes(1)
 
     repository.searchMaterial = jest.fn().mockResolvedValue([])
-    await expect(search.handler(args)).rejects.toThrow(/No results in all repository/)
+    await expect(search.handler(args)).rejects.toThrow(
+      /No results in all repository/
+    )
     expect(repository.searchMaterial).toBeCalledWith('test', undefined)
 
     repository.searchMaterial = jest.fn().mockResolvedValue([['test']])
@@ -53,9 +63,18 @@ describe('command search should be right', () => {
   })
 
   test('searchInRepository should be right ', async () => {
-    const args = command.parse(['--name', 'test', '--repository', 'test', '--category', 'test'])
+    const args = command.parse([
+      '--name',
+      'test',
+      '--repository',
+      'test',
+      '--category',
+      'test'
+    ])
 
-    await expect(search.handler(args)).rejects.toThrow(/repository .* does not does not exist/)
+    await expect(search.handler(args)).rejects.toThrow(
+      /repository .* does not does not exist/
+    )
     expect(Repository.find).toBeCalledWith('test')
 
     repository.searchMaterial = jest.fn().mockResolvedValue([])

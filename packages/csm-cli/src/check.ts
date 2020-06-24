@@ -1,4 +1,4 @@
-import { Storage } from '@csm/core'
+import { Storage } from '@tone/csm-core'
 import { CONF_FILE } from './config'
 import fs from 'fs-extra'
 import Err from './err'
@@ -8,7 +8,8 @@ export default async function () {
     throw new Err('local storage dir is not set, please run init first')
   } else {
     const { dir } = fs.readJsonSync(CONF_FILE)
-    if (dir === undefined || dir === '') throw new Err('local storage dir is not set, please run init first')
+    if (dir === undefined || dir === '')
+      throw new Err('local storage dir is not set, please run init first')
     try {
       await Storage.check(dir)
       await Storage.init(dir)

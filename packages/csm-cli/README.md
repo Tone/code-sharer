@@ -1,1 +1,1 @@
-## @csm/cli
+## @tone/csm-cli

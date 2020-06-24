@@ -1,4 +1,4 @@
-import { Repository } from '@csm/core'
+import { Repository } from '@tone/csm-core'
 import { Arguments, Argv } from 'yargs'
 import check from './check'
 import Err from './err'

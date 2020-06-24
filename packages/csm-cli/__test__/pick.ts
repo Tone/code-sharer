@@ -1,19 +1,19 @@
 import yargs from 'yargs'
 
-import { Storage, Repository } from '@csm/core'
+import { Storage, Repository } from '@tone/csm-core'
 import pick from '../src/pick'
 import check from '../src/check'
 import inquirer from 'inquirer'
 import path from 'path'
 
-jest.mock('@csm/core')
+jest.mock('@tone/csm-core')
 jest.mock('../src/check', () => jest.fn().mockResolvedValue(true))
 jest.mock('inquirer')
 
 inquirer.prompt = (jest.fn().mockResolvedValue({
   category: 'test',
   repositoryName: 'test'
-})) as unknown as inquirer.PromptModule
+}) as unknown) as inquirer.PromptModule
 
 const storage = {
   checkout: jest.fn()
@@ -38,21 +38,36 @@ const repository = {
   getConfig: jest.fn().mockReturnValue(repositoryConfig),
   find: jest.fn().mockReturnValueOnce(null).mockReturnValue(material)
 }
-Repository.repositoryList = jest.fn().mockReturnValueOnce({ size: 0 }).mockReturnValue({
-  size: 1,
-  repository: {
-    test: repository
-  }
-})
-Repository.find = jest.fn().mockReturnValueOnce(null).mockReturnValue(repository)
+Repository.repositoryList = jest
+  .fn()
+  .mockReturnValueOnce({ size: 0 })
+  .mockReturnValue({
+    size: 1,
+    repository: {
+      test: repository
+    }
+  })
+Repository.find = jest
+  .fn()
+  .mockReturnValueOnce(null)
+  .mockReturnValue(repository)
 
 const command = yargs.command(pick)
 
 describe('command pick should be right', () => {
   test('initiative pick should be right ', async () => {
-    const args = command.parse(['--name', 'test', '--repository', 'test', '--category', 'test'])
+    const args = command.parse([
+      '--name',
+      'test',
+      '--repository',
+      'test',
+      '--category',
+      'test'
+    ])
 
-    await expect(pick.handler(args)).rejects.toThrow(/repository .* does not does not exist/)
+    await expect(pick.handler(args)).rejects.toThrow(
+      /repository .* does not does not exist/
+    )
     expect(check).toBeCalledTimes(1)
     expect(Repository.find).toBeCalledWith('test')
 
@@ -65,7 +80,9 @@ describe('command pick should be right', () => {
     expect(material.pick).toBeCalledTimes(1)
     await expect(pick.handler(args)).resolves.not.toThrow()
     expect(storage.checkout).toBeCalledTimes(1)
-    expect(material.pick).toBeCalledWith(path.resolve(process.cwd(), 'category_test'))
+    expect(material.pick).toBeCalledWith(
+      path.resolve(process.cwd(), 'category_test')
+    )
   })
 
   test('interactive pick should be right ', async () => {

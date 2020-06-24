@@ -2,13 +2,13 @@ import yargs from 'yargs'
 import path from 'path'
 import fs from 'fs-extra'
 
-import { Storage } from '@csm/core'
+import { Storage } from '@tone/csm-core'
 import { CONF_FILE } from '../src/config'
 import init from '../src/init'
 
 const testDir = path.resolve(__dirname, 'test_dir_init')
 
-jest.mock('@csm/core')
+jest.mock('@tone/csm-core')
 jest.mock('../src/config', () => ({
   CONF_FILE: path.resolve(__dirname, 'test_dir_init/.csm.conf'),
   ERR_NAME: 'CLI_ERR'
