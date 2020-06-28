@@ -18,7 +18,7 @@
     "/lib/**/*"
   ],
   "dependencies": {
-    "@tone/csm-core": "1.0.0-alpha.0",
+    "@tone/csm-core": "^1.0.0-alpha.0",
     "chalk": "^4.0.0",
     "figlet": "^1.4.0",
     "fs-extra": "^9.0.0",
@@ -31,5 +31,6 @@
     "@types/figlet": "^1.2.0",
     "@types/fs-extra": "^9.0.1",
     "@types/inquirer": "^6.5.0"
-  }
+  },
+  "gitHead": "5e6d9e2b6389efa9b8100d2a74704b320558f6e8"
 }
