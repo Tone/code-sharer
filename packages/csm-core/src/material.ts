@@ -18,6 +18,12 @@ type nameStyle = Pick<
   'name' | 'author' | 'category' | 'repository'
 >
 
+/**
+ * 提供物料的基础操作，由仓库及物料约束文件构造，管理物料类型和提交记录
+ * - 环境及依赖包检测
+ * - 校验规则
+ * - 物料提交及检出
+ */
 export default class Material extends Detector {
   static parse(dir: string) {
     const configPath = path.resolve(dir, DEFAULT_MATERIAL_CONFIG_NAME)

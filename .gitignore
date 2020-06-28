@@ -25,3 +25,4 @@ junit.xml
 /packages/*/lib/*
 coverage
 tsconfig.tsbuildinfo
+/packages/*/docs/*

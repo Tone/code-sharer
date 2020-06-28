@@ -1,9 +1,38 @@
-## code-share-manager
+## code-sharer
+
+为共享源码提供的工具。支持多语言，多类别区分。支持环境变量及依赖包检测。支持指定文件结构及载入项目的位置，为约定化的项目结构提供可能。
+
+### 环境依赖
+
+- nodejs 10.0.0 以上
+- git
+
+### 使用
+
+配置全局 `.npmrc`或者`.yarnrc`
+
+```sh
+@tone:registry=https://npm.pkg.github.com
+```
+
+或者执行
+
+```sh
+# npm
+npm config set @tone:registry https://npm.pkg.github.com -g
+
+# yarn
+yarn config set @tone:registry https://npm.pkg.github.com -g
+
+```
 
 ### 项目结构
 
-- `csm-cli` : 提供终端命令操作
-- `csm-core` : 实现功能列表
+- [x] `csm-cli` : 提供终端命令操作
+  - [使用文档](./packages/csm-cli/README.md)
+- [x] `csm-core` : 实现核心功能模块
+  - [使用文档](./packages/csm-core/README.md)
+- [ ] `csm-ui`: 提供网页界面
 
 ### 项目约束
 
@@ -22,40 +51,6 @@
 
 具体配置项见 [约束](#约束)
 
-### 功能列表
-
-##### 检查
-
-检查物料是否符合约束
-
-- 发布更新
-- 下载使用
-
-##### 初始化
-
-- 仓库配置
-- 物料配置
-
-##### 配置
-
-查看和修改仓库及物料配置文件
-
-##### 发布
-
-提交物料至仓库
-
-##### 查找
-
-查找符合项目的物料
-
-##### 更新
-
-更新已有物料
-
-##### 载入
-
-下载物料源码至工程
-
 ### 流程图
 
 ![流程图](./flow.svg)
@@ -72,8 +67,6 @@
 repository = "vue"
 ## 物料文件夹命名风格 默认 name@author[hash]
 style = ""
-## 包管理器执行程序 env 位置 -1 为无包管理器
-manager = -1
 
 ## 执行环境依赖
 [[env]]

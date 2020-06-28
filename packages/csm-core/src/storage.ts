@@ -7,6 +7,13 @@ import {
   DEFAULT_BRANCH
 } from './constant'
 
+/**
+ * 提供存储库基础操作
+ * - 文件提交及版本生成
+ * - 远端更新及推送
+ * - 仓库信息
+ * - 特定版本文件检出
+ */
 export default class Storage {
   static async clone(url: string, dir = DEFAULT_REPOSITORY_PATH) {
     await fs.ensureDir(dir)

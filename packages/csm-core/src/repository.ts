@@ -15,6 +15,12 @@ interface RepositoryList {
   size: number
 }
 
+/**
+ * 提供仓库的基础操作，由仓库约束文件构造，管理物料类型和提交记录
+ * - 环境及依赖包检测
+ * - 物料校验规则
+ * - 物料查找及提交版本管理
+ */
 export default class Repository extends Detector {
   private static configList(dir: string): string[] {
     const files = fs.readdirSync(dir)
