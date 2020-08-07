@@ -10,3 +10,4 @@
 **/src/types/
 jest.config.js
 **/docs/
+*.config.js

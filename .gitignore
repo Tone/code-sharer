@@ -26,3 +26,4 @@ junit.xml
 coverage
 tsconfig.tsbuildinfo
 /packages/*/docs/*
+.next

@@ -14,6 +14,9 @@
   },
   "rules": {
     "semi": ["error", "never"],
+    "@typescript-eslint/restrict-template-expressions": {
+      "allowAny": true
+    },
     "quotes": ["error", "single"],
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-explicit-any": 1,

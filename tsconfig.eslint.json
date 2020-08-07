@@ -1,6 +1,12 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["packages/**/src/*", "packages/**/__test__/*", "scripts/**/*"],
+  "include": [
+    "packages/**/src/*",
+    "packages/**/__test__/*",
+    "scripts/**/*",
+    "packages/csm-ui/pages/**/*",
+    "packages/csm-ui/components/**/*"
+  ],
   "exclude": [
     "node_modules",
     "dist",
