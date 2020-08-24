@@ -27,3 +27,4 @@ coverage
 tsconfig.tsbuildinfo
 /packages/*/docs/*
 .next
+packages/csm-ui/report.20200824.162308.26700.0.001.json

@@ -1,11 +1,10 @@
 
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import styled from 'styled-components'
 import tw from 'twin.macro'
 
 
 interface PaginationProps {
-  current?: number,
   pageSize?: number,
   total: number,
   onChange?: (page: number, pageSize: number) => void
@@ -18,19 +17,14 @@ const Btn = styled.li<{ selected?: boolean }>`
 
 function Pagination(props: PaginationProps) {
 
-  const { current = 1, pageSize = 6, total, onChange } = props
+  const { pageSize = 6, total, onChange } = props
 
-  const [currentPage, setCurrent] = useState(current)
+  const [currentPage, setCurrent] = useState(1)
 
   useEffect(() => {
     setCurrent(1)
     if (onChange !== undefined) onChange(1, pageSize)
-  }, [pageSize])
-
-  useEffect(() => {
-    setCurrent(current)
-    if (onChange !== undefined) onChange(current, pageSize)
-  }, [current])
+  }, [pageSize, total])
 
 
   const page = useMemo(() => {

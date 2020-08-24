@@ -4,6 +4,7 @@ import tw from 'twin.macro'
 
 import useFetch from '../components/use_fetch'
 import Category from '../components/category'
+import { GetStaticProps } from 'next'
 
 const RepoCard = styled('div')`
   ${tw`text-base mb-2`};
@@ -20,7 +21,7 @@ const ListItem = styled.li<{ selected: boolean }>`
   ${props => props.selected ? tw`bg-green-100 text-green-500 border-r-2 border-green-500` : ''};
 `
 
-function HomePage() {
+function HomePage(props: { project?: string }) {
   const repositories = useFetch('/api/repos')
 
   const defaultRepoKey = useMemo(() => {
@@ -86,9 +87,19 @@ function HomePage() {
       }
     </aside>
     <main className="bg-gray-100 flex-1">
-      <Category category={'ss'} repo="s" />
+      {!curCategory ? null :
+        <Category category={curCategory} repo={curRepoKey} project={props.project} />
+      }
     </main>
   </div>
 }
 
 export default HomePage
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  return {
+    props: {
+      project: process.cwd(),
+    }
+  }
+}

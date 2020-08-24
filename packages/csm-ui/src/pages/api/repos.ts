@@ -30,15 +30,18 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
       ],
       category: [{
         name: 'c1',
-        version: 'v3'
+        version: 'v3',
+        position: 'p1'
       },
       {
         name: 'c2',
-        version: 'v3'
+        version: 'v3',
+        position: 'p1'
       },
       {
         name: 'c3',
-        version: 'v3'
+        version: 'v3',
+        position: 'p1'
       }]
     },
     {

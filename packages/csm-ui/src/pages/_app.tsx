@@ -3,12 +3,14 @@ import type { AppProps /*, AppContext */ } from 'next/app'
 import { RecoilRoot } from 'recoil'
 
 import Message from '../components/message'
+import Modal from '../components/modal'
 import '../style.css'
 
 function App({ Component, pageProps }: AppProps) {
   return (<RecoilRoot>
     <Component {...pageProps} />
     <Message />
+    <Modal />
   </RecoilRoot>)
 }
 
