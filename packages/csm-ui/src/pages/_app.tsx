@@ -4,7 +4,7 @@ import { RecoilRoot } from 'recoil'
 
 import Message from '../components/message'
 import Modal from '../components/modal'
-import '../style.css'
+import './style.css'
 
 function App({ Component, pageProps }: AppProps) {
   return (<RecoilRoot>

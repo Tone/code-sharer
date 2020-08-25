@@ -89,5 +89,4 @@ function Pagination(props: PaginationProps) {
   )
 }
 
-
 export default Pagination
