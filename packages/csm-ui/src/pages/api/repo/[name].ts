@@ -1,23 +1,39 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+import store from '../../../service'
 
 
-import { materials } from '../../../mock'
-
-export default (req: NextApiRequest, res: NextApiResponse) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   const {
     query: { name, category },
-    method,
   } = req
 
-  switch (method) {
-    case 'GET':
-      // Get data from your database
-      res.status(200).json({
-        name, category, description: '在中台产品的研发过程中，会出现不同的设计规范和实现方式，但其中往往存在很多类似的页面和组件，这些类似的组件会被抽离成一套标准规范。', materials: materials.materials
-      })
-      break
-    default:
-      res.setHeader('Allow', ['GET', 'PUT'])
-      res.status(405).end(`Method ${method} Not Allowed`)
+
+  if (!name || !category || Array.isArray(name) || Array.isArray(category)) {
+    res.status(400)
+    return
+  }
+
+  try {
+    const materials = await store.getMaterials(name, category)
+
+    const newest: Record<string, any> = {}
+
+    materials.forEach(m => {
+      if (newest[m.name] === undefined) {
+        newest[m.name] = {
+          ...m,
+          tags: m.tags.split(',').filter(t => !!t)
+        }
+      } else if (+newest[m.name].ctm < +m.ctm) {
+        newest[m.name] = {
+          ...m,
+          tags: m.tags.split(',').filter(t => !!t)
+        }
+      }
+    })
+
+    res.status(200).json(Object.values(newest))
+  } catch (e) {
+    res.status(500).send(e)
   }
 }

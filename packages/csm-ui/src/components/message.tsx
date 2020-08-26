@@ -8,12 +8,12 @@ export default function Message() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setMessage('')
-    }, 1500)
+    }, 3000)
     return () => clearTimeout(timer)
   })
 
   return (
-    <div className="fixed right-20 top-20">
+    <div className={`fixed right-20 top-20 z-40 bg-red-600 bg-opacity-50 p-6 ${!message ? 'hidden' : ''}`}>
       {message}
     </div>
   )

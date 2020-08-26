@@ -15,12 +15,15 @@ async function fetcher(...args: any[]) {
   // @ts-ignore: Unreachable code error
   const res = await fetch(...args)
   if (res.status > 300) {
-    throw (new ResErr(res.status, res.statusText))
+    const { msg, message } = await res.json()
+    const errText = msg || message || res.statusText
+
+    throw (new ResErr(res.status, errText))
   }
   return await res.json()
 }
 
-function useFetch(api: string) {
+function useFetch(api: string | null) {
   const setMessage = useSetRecoilState(messageState)
   const { data, error } = useSWR(api, fetcher, { shouldRetryOnError: false })
   if (error?.code !== undefined) {

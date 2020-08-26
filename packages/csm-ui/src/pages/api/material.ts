@@ -1,23 +1,28 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+import store from '../../service'
+import path from 'path'
 
 
-import { materials } from '../../mock'
 
-export default (req: NextApiRequest, res: NextApiResponse) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   const {
-    query: { name, category },
-    method,
+    query: { r, c, n, d },
   } = req
+  if (!r || !c || !n || Array.isArray(r) || Array.isArray(c) || Array.isArray(n)) {
+    res.status(400).send(null)
+    return
+  }
 
-  switch (method) {
-    case 'GET':
-      // Get data from your database
-      res.status(200).json({
-        name, category, description: '在中台产品的研发过程中，会出现不同的设计规范和实现方式，但其中往往存在很多类似的页面和组件，这些类似的组件会被抽离成一套标准规范。', materials: materials.materials
-      })
-      break
-    default:
-      res.setHeader('Allow', ['GET', 'PUT'])
-      res.status(405).end(`Method ${method} Not Allowed`)
+  try {
+    const material = await store.findMaterial(r, c, n)
+
+    if (material === null) {
+      res.status(500).send({ msg: 'material does not exist' })
+      return
+    }
+    await material.pick(path.join(process.cwd(), d))
+    res.status(200).send(null)
+  } catch (e) {
+    res.status(500).send(e)
   }
 }

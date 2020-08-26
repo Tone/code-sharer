@@ -8,7 +8,7 @@ import Storage from './storage'
 import History, { recordRow } from './history'
 import Material from './material'
 
-interface RepositoryList {
+export interface RepositoryList {
   repository: {
     [repositoryName: string]: Repository
   }

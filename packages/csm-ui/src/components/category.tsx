@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import styled from 'styled-components'
 import tw from 'twin.macro'
 import { Download } from 'react-feather';
@@ -13,13 +13,12 @@ const Tag = styled.li<{ selected?: boolean }>`
   ${props => props.selected ? tw`bg-green-500 text-white hover:text-white` : ''};
 `
 
-function Category(props: { category: any, repo: string, project?: string }) {
+function Category(props: { category: any, project?: string }) {
   const setModal = useSetRecoilState(modalState)
+  const { category, project } = props
+  const { val: { description, position, }, repo, name } = category
 
-
-  const { category, repo, project } = props
-  const info = useFetch(`/api/repo/${repo}?category=${category.name}`)
-  const { description, materials = [] } = info || {}
+  const materials = useFetch(`/api/repo/${repo}?category=${name}`)
 
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
   const [input, setInput] = useState('')
@@ -34,6 +33,7 @@ function Category(props: { category: any, repo: string, project?: string }) {
   const [{ page, pageSize }, setPagination] = useState({ page: 1, pageSize: 6 })
 
   const filterMaterials = useMemo(() => {
+    if (materials === undefined) return []
     return materials.filter(m => {
       return m.name.includes(input) && Array.from(selectedTags).every(t => m.tags.includes(t))
     })
@@ -62,29 +62,41 @@ function Category(props: { category: any, repo: string, project?: string }) {
   }
 
 
-  const download = (material, dir: string) => {
 
+  const [downloadUrl, setDownloadUrl] = useState<null | string>(null)
+
+  const downloadStatus = useFetch(downloadUrl)
+
+
+  const download = (material, dir: string) => {
+    setDownloadUrl(`/api/material?r=${repo}&c=${name}&n=${material.name}&d=${dir}`)
   }
+
+  const dirRef = useRef()
 
   const showModal = (material: any) => {
     setModal(<div>
       <h5 className="text-base mb-4">Project Path:<br /> <span className="text-sm text-gray-500">{project}</span></h5>
       <label className="text-base" htmlFor="name">Download Location:</label> <br />
-      <input className="outline-none appearance-none border p-1 pl-2 text-sm w-7/12 flex-none focus:border-green-500 mb-4" name="dir" type="text" defaultValue={category.position} />
+      <input ref={dirRef} className="outline-none appearance-none border p-1 pl-2 text-sm w-7/12 flex-none focus:border-green-500 mb-4" name="dir" type="text" defaultValue={position} />
+
       <div className="flex justify-end space-x-2 text-xs">
-        <button className="px-4 py-1 text-sm border outline-none focus:outline-none cursor-pointer transition-colors duration-500 bg-green-500 hover:border-green-500 text-white ">
+        <button className="px-4 py-1 text-sm border outline-none focus:outline-none cursor-pointer transition-colors duration-500 bg-green-500 hover:border-green-500 text-white " onClick={() => download(material, dirRef.current.value)}>
           OK
         </button>
         <button className="px-4 py-1 text-sm border outline-none focus:outline-none cursor-pointer transition-colors duration-500 hover:border-green-500 hover:text-green-500 " onClick={() => setModal(null)}>
           Cancel
         </button>
       </div>
+      <div className="p-4 bg-black bg-opacity-50 text-2xl">
+        {downloadStatus === undefined ? 'Download...' : 'Complete'}
+      </div>
     </div>)
   }
 
   return <div className="flex flex-col max-h-full">
     <div className="bg-white p-4">
-      <h4 className="text-2xl"> {category.name}</h4>
+      <h4 className="text-2xl"> {name}</h4>
       <p className="text-base m-1">{description}</p>
     </div>
     <div className="m-4 p-2 flex items-start bg-white space-x-4">
