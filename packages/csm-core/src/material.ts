@@ -192,9 +192,12 @@ export default class Material extends Detector {
     await this.record([...dirFiles, configPath])
   }
 
-  async pick(targetDir: string) {
+  async check() {
     await this.repository.checkEnv()
     await this.checkPackage()
+  }
+
+  async pick(targetDir: string) {
     const dir = await this.getDir()
     if (!fs.pathExistsSync(dir)) throw new Error(`${dir} does not exists`)
     const srcDir = path.join(dir, SOURCE_DIR)
