@@ -3,7 +3,6 @@ import store from '../../service'
 import path from 'path'
 
 
-
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const {
     query: { r, c, n, d },
@@ -20,8 +19,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(500).send({ msg: 'material does not exist' })
       return
     }
-    await material.pick(path.join(process.cwd(), d))
-    res.status(200).send(null)
+    // await material.pick(path.join(process.cwd(), d))
+    res.status(200).send({})
   } catch (e) {
     res.status(500).send(e)
   }

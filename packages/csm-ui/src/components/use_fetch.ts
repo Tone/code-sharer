@@ -11,7 +11,7 @@ class ResErr extends Error {
   }
 }
 
-async function fetcher(...args: any[]) {
+export async function fetcher(...args: any[]) {
   // @ts-ignore: Unreachable code error
   const res = await fetch(...args)
   if (res.status > 300) {
@@ -23,7 +23,8 @@ async function fetcher(...args: any[]) {
   return await res.json()
 }
 
-function useFetch(api: string | null) {
+
+function useFetch(api: any) {
   const setMessage = useSetRecoilState(messageState)
   const { data, error } = useSWR(api, fetcher, { shouldRetryOnError: false })
   if (error?.code !== undefined) {

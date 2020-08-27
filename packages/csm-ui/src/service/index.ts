@@ -17,6 +17,10 @@ class Store {
     this.cache = fs.existsSync(cacheFile) ? fs.readJSONSync(cacheFile) : {}
     this.storeUrl = storeUrl.filter(url => !!url)
     this.store = new Set()
+    this.repos = {
+      repository: {},
+      size: 0
+    }
   }
 
   async add(url: string) {
@@ -37,9 +41,19 @@ class Store {
     return path.join(TEMP_DIR, id)
   }
 
+  private exist(url: string) {
+    const cacheId = this.getCache(url)
+    if (cacheId === undefined) return
+    if (!fs.existsSync(this.getDir(cacheId))) return
+    return cacheId
+  }
 
-  async init() {
+  async init(cache = true) {
     const downloadDir = this.storeUrl.map((url) => {
+      if (cache) {
+        const cacheId = this.exist(url)
+        if (cacheId !== undefined) return Promise.resolve(cacheId)
+      }
       return this.download(url)
     })
 
@@ -64,9 +78,6 @@ class Store {
   }
 
   async download(url: string): Promise<string> {
-    const cacheId = this.getCache(url)
-    if (cacheId !== undefined) return cacheId
-
     const id = uuid()
     const tempPath = this.getDir(id)
 
@@ -106,11 +117,12 @@ class Store {
       fs.removeSync(this.getDir(id))
       const newId = await this.download(url)
       this.setCache(url, newId)
+      this.writeCache()
     }
   }
 
   async parseRepo(url: string) {
-    let id = this.getCache(url)
+    let id = this.exist(url)
 
     if (id === undefined) {
       id = await this.download(url)

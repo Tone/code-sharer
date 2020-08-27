@@ -1,12 +1,11 @@
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import tw from 'twin.macro'
 import { Download } from 'react-feather';
-import { useSetRecoilState } from 'recoil'
+import { useRecoilState } from 'recoil'
 import { modalState } from './store'
 import useFetch from './use_fetch'
 import Pagination from './pagination'
-
 
 const Tag = styled.li<{ selected?: boolean }>`
   ${tw`text-xs border px-4 py-1 inline-block cursor-pointer mx-1 mb-2 transition-colors duration-500 hover:border-green-500 hover:text-green-500 `};
@@ -14,7 +13,8 @@ const Tag = styled.li<{ selected?: boolean }>`
 `
 
 function Category(props: { category: any, project?: string }) {
-  const setModal = useSetRecoilState(modalState)
+  const [modalChildren, setModal] = useRecoilState(modalState)
+
   const { category, project } = props
   const { val: { description, position, }, repo, name } = category
 
@@ -56,17 +56,13 @@ function Category(props: { category: any, project?: string }) {
     [selectedTags],
   )
 
-
   const paginationChange = (page: number, pageSize: number) => {
     setPagination({ page, pageSize })
   }
 
-
-
   const [downloadUrl, setDownloadUrl] = useState<null | string>(null)
 
   const downloadStatus = useFetch(downloadUrl)
-
 
   const download = (material, dir: string) => {
     setDownloadUrl(`/api/material?r=${repo}&c=${name}&n=${material.name}&d=${dir}`)
@@ -74,25 +70,36 @@ function Category(props: { category: any, project?: string }) {
 
   const dirRef = useRef()
 
-  const showModal = (material: any) => {
+  const [modalMaterial, setModalMaterial] = useState(null)
+
+
+  useEffect(() => {
+    if (!modalMaterial) return
+
     setModal(<div>
       <h5 className="text-base mb-4">Project Path:<br /> <span className="text-sm text-gray-500">{project}</span></h5>
       <label className="text-base" htmlFor="name">Download Location:</label> <br />
       <input ref={dirRef} className="outline-none appearance-none border p-1 pl-2 text-sm w-7/12 flex-none focus:border-green-500 mb-4" name="dir" type="text" defaultValue={position} />
 
       <div className="flex justify-end space-x-2 text-xs">
-        <button className="px-4 py-1 text-sm border outline-none focus:outline-none cursor-pointer transition-colors duration-500 bg-green-500 hover:border-green-500 text-white " onClick={() => download(material, dirRef.current.value)}>
+        <button className="px-4 py-1 text-sm border outline-none focus:outline-none cursor-pointer transition-colors duration-500 bg-green-500 hover:border-green-500 text-white " onClick={() => download(modalMaterial, dirRef.current.value)}>
           OK
         </button>
         <button className="px-4 py-1 text-sm border outline-none focus:outline-none cursor-pointer transition-colors duration-500 hover:border-green-500 hover:text-green-500 " onClick={() => setModal(null)}>
-          Cancel
+          Close
         </button>
       </div>
-      <div className="p-4 bg-black bg-opacity-50 text-2xl">
+      <div className={`p-4 bg-black bg-opacity-50 text-2xl mt-4 ${downloadUrl ? '' : 'hidden'}`}>
         {downloadStatus === undefined ? 'Download...' : 'Complete'}
       </div>
     </div>)
-  }
+
+  }, [modalMaterial, downloadUrl, downloadStatus])
+
+  useEffect(() => {
+    if (!modalChildren) setModalMaterial(null)
+  }, [modalChildren])
+
 
   return <div className="flex flex-col max-h-full">
     <div className="bg-white p-4">
@@ -110,7 +117,7 @@ function Category(props: { category: any, project?: string }) {
         <div key={m.name} className="md:w-1/3 sm:w-full p-1">
           <div className="text-xs border p-2 bg-white my-2 transition-shadow duration-500 hover:shadow h-full">
             <div className="group h-32 bg-gray-400 relative hover:bg-black hover:bg-opacity-25 flex justify-center items-center transition duration-500">
-              <Download className="cursor-pointer opacity-0 group-hover:block group-hover:opacity-100 transition-all duration-500" onClick={() => showModal(m)} />
+              <Download className="cursor-pointer opacity-0 group-hover:block group-hover:opacity-100 transition-all duration-500" onClick={() => setModalMaterial(m)} />
             </div>
             <h5 className="text-lg">{m.name} <small>{m.author}</small></h5>
             <p className="text-sm my-1">{m.description}</p>

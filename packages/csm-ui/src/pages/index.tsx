@@ -1,11 +1,13 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import tw from 'twin.macro'
+import { RefreshCcw, DownloadCloud } from 'react-feather';
 
 
-import useFetch from '../components/use_fetch'
+import { mutate } from 'swr'
+import useFetch, { fetcher } from '../components/use_fetch'
 import Category from '../components/category'
-import { GetStaticProps } from 'next'
+import { GetServerSideProps } from 'next'
 
 import store from '../service'
 
@@ -25,6 +27,8 @@ const ListItem = styled.li<{ selected: boolean }>`
 `
 
 function HomePage(props: { storages: string[], project?: string }) {
+
+
   const { storages } = props
   const [curStorage, setCurStorage] = useState(storages[0])
 
@@ -53,15 +57,32 @@ function HomePage(props: { storages: string[], project?: string }) {
 
 
 
+  const refresh = async () => {
+    await fetcher(`/api/storage?s=${curStorage}`)
+    mutate(`/api/repos?s=${curStorage}`)
+  }
 
+  const update = async () => {
+    await fetcher(`/api/storage`)
+    location.reload()
+  }
 
   return <div className="container mx-auto flex flex-row items-stretch h-screen bg-white p-x-8 text-gray-800 text-xl">
     <aside className="w-64 border-r border-gray-200 p-4 pr-0" style={{ boxShadow: '2px 0 8px 0 rgba(29,35,41,.05)' }}>
       <div className="flex flex-row text-black-8 flex-wrap pr-4">
-        <label className="w-full mb-2 -ml-2">
+        <label className="w-full mb-2 -ml-2 flex justify-between items-center">
           Storage:
+          <div>
+            <button className="px-2 py-1 border outline-none focus:outline-none cursor-pointer transition-colors duration-500 hover:border-green-500 hover:text-green-500 " onClick={refresh}>
+              <RefreshCcw size={14} />
+            </button>
+            <button className="px-2 py-1 border outline-none ml-2 focus:outline-none cursor-pointer transition-colors duration-500 hover:border-green-500 hover:text-green-500 " onClick={update}>
+              <DownloadCloud size={14} />
+            </button>
+          </div>
+
         </label>
-        <select className="flex-1 outline-none border-gray-400 pl-2 border" value={curStorage} onChange={e => setCurStorage(e.target.value)}>
+        <select className="w-full flex-1 outline-none border-gray-400 pl-2 border" value={curStorage} onChange={e => setCurStorage(e.target.value)}>
           {(storages ?? []).map(s => (
             <option value={s} key={s}>
               {s}
@@ -72,7 +93,7 @@ function HomePage(props: { storages: string[], project?: string }) {
         <label className="w-full mb-2 -ml-2">
           Repository:
         </label>
-        <select className="flex-1 outline-none border-gray-400 pl-2 border" value={curRepo ? curRepo.repository : ''} onChange={e => {
+        <select className="w-full flex-1 outline-none border-gray-400 pl-2 border" value={curRepo ? curRepo.repository : ''} onChange={e => {
           const repo = repositories.find(r => r.repository === e.target.value)
           setCurRepo(repo)
         }}>
@@ -119,7 +140,7 @@ function HomePage(props: { storages: string[], project?: string }) {
 
 export default HomePage
 
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   await store.init()
   return {
     props: {
