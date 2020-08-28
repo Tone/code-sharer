@@ -4,8 +4,10 @@
     "packages/**/src/*",
     "packages/**/__test__/*",
     "scripts/**/*",
-    "packages/csm-ui/pages/**/*",
-    "packages/csm-ui/components/**/*"
+    "packages/csm-ui/src/pages/**/*",
+    "packages/csm-ui/src/components/**/*",
+    "packages/csm-ui/src/service/**/*",
+    "packages/csm-ui/src/mock/**/*"
   ],
   "exclude": [
     "node_modules",

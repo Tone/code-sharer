@@ -12,17 +12,17 @@ class ResErr extends Error {
 }
 
 export async function fetcher(...args: any[]) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
   // @ts-ignore: Unreachable code error
   const res = await fetch(...args)
   if (res.status > 300) {
     const { msg, message } = await res.json()
-    const errText = msg || message || res.statusText
+    const errText = msg ?? message ?? res.statusText
 
-    throw (new ResErr(res.status, errText))
+    throw new ResErr(res.status, errText)
   }
   return await res.json()
 }
-
 
 function useFetch(api: any) {
   const setMessage = useSetRecoilState(messageState)

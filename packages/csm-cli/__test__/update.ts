@@ -1,12 +1,12 @@
 import yargs from 'yargs'
 
-import { Repository } from '@tone/csm-core'
+import { Repository } from '@tone./csm-core'
 import update from '../src/update'
 import check from '../src/check'
 
 jest.spyOn(console, 'log').mockImplementation()
 
-jest.mock('@tone/csm-core')
+jest.mock('@tone./csm-core')
 jest.mock('../src/check', () => jest.fn().mockResolvedValue(true))
 jest.mock('ora', () =>
   jest.fn().mockReturnValue({

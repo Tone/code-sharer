@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import tw from 'twin.macro'
-import { RefreshCcw, DownloadCloud } from 'react-feather';
-
+import { RefreshCcw, DownloadCloud } from 'react-feather'
 
 import { mutate } from 'swr'
 import useFetch, { fetcher } from '../components/use_fetch'
@@ -26,13 +25,15 @@ const ListItem = styled.li<{ selected: boolean }>`
   ${props => props.selected ? tw`bg-green-100 text-green-500 border-r-2 border-green-500` : ''};
 `
 
+const Btn = styled.button`
+  ${tw`px-2 py-1 border outline-none ml-2 focus:outline-none cursor-pointer transition-colors duration-500 hover:border-green-500 hover:text-green-500`};
+`
+
 function HomePage(props: { storages: string[], project?: string }) {
-
-
   const { storages } = props
   const [curStorage, setCurStorage] = useState(storages[0])
 
-  const [curRepo, setCurRepo] = useState(null)
+  const [curRepo, setCurRepo] = useState<any>(null)
   const repositories = useFetch(`/api/repos?s=${curStorage}`)
 
   useEffect(() => {
@@ -41,7 +42,7 @@ function HomePage(props: { storages: string[], project?: string }) {
     }
   }, [repositories])
 
-  const [curCategory, setCurCategory] = useState()
+  const [curCategory, setCurCategory] = useState<any>()
 
   function handleCategory(name: string) {
     if (curRepo !== null) {
@@ -55,15 +56,13 @@ function HomePage(props: { storages: string[], project?: string }) {
     }
   }, [curRepo])
 
-
-
   const refresh = async () => {
     await fetcher(`/api/storage?s=${curStorage}`)
     mutate(`/api/repos?s=${curStorage}`)
   }
 
   const update = async () => {
-    await fetcher(`/api/storage`)
+    await fetcher('/api/storage')
     location.reload()
   }
 
@@ -73,14 +72,13 @@ function HomePage(props: { storages: string[], project?: string }) {
         <label className="w-full mb-2 -ml-2 flex justify-between items-center">
           Storage:
           <div>
-            <button className="px-2 py-1 border outline-none focus:outline-none cursor-pointer transition-colors duration-500 hover:border-green-500 hover:text-green-500 " onClick={refresh}>
+            <Btn onClick={refresh}>
               <RefreshCcw size={14} />
-            </button>
-            <button className="px-2 py-1 border outline-none ml-2 focus:outline-none cursor-pointer transition-colors duration-500 hover:border-green-500 hover:text-green-500 " onClick={update}>
+            </Btn>
+            <Btn onClick={update}>
               <DownloadCloud size={14} />
-            </button>
+            </Btn>
           </div>
-
         </label>
         <select className="w-full flex-1 outline-none border-gray-400 pl-2 border" value={curStorage} onChange={e => setCurStorage(e.target.value)}>
           {(storages ?? []).map(s => (
@@ -94,35 +92,35 @@ function HomePage(props: { storages: string[], project?: string }) {
           Repository:
         </label>
         <select className="w-full flex-1 outline-none border-gray-400 pl-2 border" value={curRepo ? curRepo.repository : ''} onChange={e => {
-          const repo = repositories.find(r => r.repository === e.target.value)
+          const repo = repositories.find((r: any) => r.repository === e.target.value)
           setCurRepo(repo)
         }}>
-          {(repositories ?? []).map(r => (
+          {(repositories ?? []).map((r: any) => (
             <option value={r.repository} key={r.repository}>
               {r.repository}
             </option>
           ))
           }
         </select>
-        {!curRepo ? null :
-          <div className="w-full my-2">
+        {!curRepo ? null
+          : <div className="w-full my-2">
             <RepoCard>
               <h5>Env:</h5>
               <ul>
-                {curRepo.env.map(e => <Label key={e.exec}>{e.exec}:{e.version}</Label>)}
+                {curRepo.env.map((e: any) => <Label key={e.exec}>{e.exec}:{e.version}</Label>)}
               </ul>
             </RepoCard>
             <RepoCard>
               <h5>Package:</h5>
               <ul>
-                {curRepo.package.map(p => <Label key={p.name}>{p.name}:{p.version}</Label>)}
+                {curRepo.package.map((p: any) => <Label key={p.name}>{p.name}:{p.version}</Label>)}
               </ul>
             </RepoCard>
           </div>
         }
       </div>
-      {!curRepo ? null :
-        <div className="text-base">
+      {!curRepo ? null
+        : <div className="text-base">
           <h5>Category:</h5>
           <ul>
             {Object.keys(curRepo.category).map(c => <ListItem selected={curCategory?.name === c} onClick={() => handleCategory(c)} key={c}>{c}</ListItem>)}
@@ -131,8 +129,8 @@ function HomePage(props: { storages: string[], project?: string }) {
       }
     </aside>
     <main className="bg-gray-100 flex-1">
-      {!curCategory ? null :
-        <Category category={curCategory} project={props.project} />
+      {!curCategory ? null
+        : <Category category={curCategory} project={props.project} />
       }
     </main>
   </div>

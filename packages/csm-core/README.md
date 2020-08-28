@@ -1,4 +1,4 @@
-## @tone/csm-core
+## @tone./csm-core
 
 提供了基础功能，主要包括：
 

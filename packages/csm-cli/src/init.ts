@@ -1,5 +1,5 @@
 import { Arguments, Argv, CommandModule } from 'yargs'
-import { Storage } from '@tone/csm-core'
+import { Storage } from '@tone./csm-core'
 import fs from 'fs-extra'
 import { CONF_FILE } from './config'
 

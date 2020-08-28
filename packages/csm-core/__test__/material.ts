@@ -264,8 +264,6 @@ describe('Material method should be right', () => {
     const src = path.resolve(testDir, 'dir_src')
 
     await expect(material.pick(src)).resolves.not.toThrow()
-    expect(RepositoryMock.checkEnv).toBeCalledTimes(1)
-    expect(material.checkPackage).toBeCalledTimes(1)
     expect(fs.pathExistsSync(path.resolve(src, 'test/1.test'))).toBe(true)
     fs.removeSync(testDir)
   })

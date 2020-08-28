@@ -1,4 +1,4 @@
-import { Storage } from '@tone/csm-core'
+import { Storage } from '@tone./csm-core'
 import path from 'path'
 import fs from 'fs-extra'
 
@@ -8,7 +8,7 @@ import check from '../src/check'
 const testDir = path.resolve(__dirname, 'test_dir')
 const testFile = path.resolve(testDir, '.csm.conf')
 
-jest.mock('@tone/csm-core')
+jest.mock('@tone./csm-core')
 jest.mock('../src/config', () => ({
   CONF_FILE: path.resolve(__dirname, 'test_dir/.csm.conf'),
   ERR_NAME: 'CLI_ERR'

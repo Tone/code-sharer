@@ -1,13 +1,13 @@
-## @tone/csm-cli
+## @tone./csm-cli
 
 安装
 
 ```bash
 # yarn
-yarn global add @tone/csm-cli
+yarn global add @tone./csm-cli
 
 # npm
-npm i @tone/csm-cli -g
+npm i @tone./csm-cli -g
 ```
 
 提供命令:

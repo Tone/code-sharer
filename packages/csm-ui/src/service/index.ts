@@ -1,13 +1,18 @@
 import path from 'path'
 import { v4 as uuid } from 'uuid'
-import git from 'simple-git';
+import git from 'simple-git'
 import fs from 'fs-extra'
-import { Storage, Repository, RepositoryList, History } from '@tone/csm-core'
+import { Storage, Repository, RepositoryList, History } from '@tone./csm-core'
 
-import { TEMP_DIR, cacheFile, officialRemoteStoreListUrl, customRemoteStoreListUrl } from './config'
+import {
+  TEMP_DIR,
+  cacheFile,
+  officialRemoteStoreListUrl,
+  customRemoteStoreListUrl
+} from './config'
 
 class Store {
-  private cache: { [index: string]: string }
+  private cache: { [index: string]: string | undefined }
   private repos: RepositoryList
   readonly storeUrl: string[]
 
@@ -15,7 +20,7 @@ class Store {
 
   constructor(storeUrl: string[]) {
     this.cache = fs.existsSync(cacheFile) ? fs.readJSONSync(cacheFile) : {}
-    this.storeUrl = storeUrl.filter(url => !!url)
+    this.storeUrl = storeUrl.filter((url) => url !== '')
     this.store = new Set()
     this.repos = {
       repository: {},
@@ -49,19 +54,19 @@ class Store {
   }
 
   async init(cache = true) {
-    const downloadDir = this.storeUrl.map((url) => {
+    const downloadDir = this.storeUrl.map(async (url: string) => {
       if (cache) {
         const cacheId = this.exist(url)
-        if (cacheId !== undefined) return Promise.resolve(cacheId)
+        if (cacheId !== undefined) return await Promise.resolve(cacheId)
       }
-      return this.download(url)
+      return await this.download(url)
     })
 
     const ids = await Promise.all(downloadDir)
     this.writeCache()
 
-    ids.forEach(id => {
-      this.parseStore(id).forEach(s => this.store.add(s))
+    ids.forEach((id) => {
+      this.parseStore(id).forEach((s) => this.store.add(s))
     })
   }
 
@@ -71,7 +76,10 @@ class Store {
 
     if (fs.existsSync(repos)) {
       const file = fs.readFileSync(repos)
-      return file.toString().split(/\n|\r/).filter(s => !!s)
+      return file
+        .toString()
+        .split(/\n|\r/)
+        .filter((s) => s !== '')
     }
 
     return []
@@ -88,7 +96,6 @@ class Store {
     return id
   }
 
-
   clean() {
     this.cache = {}
     this.writeCache()
@@ -98,12 +105,12 @@ class Store {
     return this.cache[key]
   }
 
-
   setCache(key: string, val: string) {
     this.cache[key] = val
   }
 
   deleteCache(key: string) {
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete this.cache[key]
   }
 
@@ -113,7 +120,7 @@ class Store {
 
   async refresh(url: string) {
     const id = this.getCache(url)
-    if (id) {
+    if (id !== undefined) {
       fs.removeSync(this.getDir(id))
       const newId = await this.download(url)
       this.setCache(url, newId)
@@ -136,21 +143,20 @@ class Store {
     return repos
   }
 
-
   async getMaterials(repo: string, category: string) {
     const { repository } = this.repos
 
-    if (!repository[repo]) return []
+    if (repository[repo] !== undefined) return []
 
     const record = await repository[repo].searchMaterial('', category)
 
-    return record.map(r => History.transform(r))
+    return record.map((r) => History.transform(r))
   }
 
   async findMaterial(repo: string, category: string, name: string) {
     const { repository } = this.repos
 
-    if (!repository[repo]) return null
+    if (repository[repo] !== undefined) return null
 
     return await repository[repo].find(name, category)
   }

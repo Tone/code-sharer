@@ -1,11 +1,11 @@
 import yargs from 'yargs'
 
-import { Storage, Repository, History } from '@tone/csm-core'
+import { Storage, Repository, History } from '@tone./csm-core'
 import publish from '../src/publish'
 import check from '../src/check'
 import inquirer from 'inquirer'
 
-jest.mock('@tone/csm-core')
+jest.mock('@tone./csm-core')
 jest.mock('../src/check', () => jest.fn().mockResolvedValue(true))
 jest.mock('inquirer')
 

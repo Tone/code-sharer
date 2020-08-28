@@ -3,7 +3,7 @@ import store from '../../service'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const {
-    query: { s },
+    query: { s }
   } = req
 
   if (Array.isArray(s)) {
@@ -12,7 +12,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    if (s) {
+    if (s !== '') {
       await store.refresh(s)
     } else {
       await store.init(false)

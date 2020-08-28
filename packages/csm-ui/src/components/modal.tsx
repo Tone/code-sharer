@@ -1,6 +1,6 @@
 import { useRecoilState } from 'recoil'
 import { modalState } from './store'
-import { X } from 'react-feather';
+import { X } from 'react-feather'
 
 function Modal() {
   const [modalChildren, setModalChildren] = useRecoilState(modalState)

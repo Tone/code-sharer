@@ -1,6 +1,6 @@
 import yargs from 'yargs'
 
-import { Storage, Repository, Material } from '@tone/csm-core'
+import { Storage, Repository, Material } from '@tone./csm-core'
 import submit from '../src/submit'
 import check from '../src/check'
 import inquirer from 'inquirer'
@@ -8,7 +8,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import { mocked } from 'ts-jest/utils'
 
-jest.mock('@tone/csm-core')
+jest.mock('@tone./csm-core')
 jest.mock('../src/check', () => jest.fn().mockResolvedValue(true))
 jest.mock('inquirer')
 jest.mock('fs-extra')

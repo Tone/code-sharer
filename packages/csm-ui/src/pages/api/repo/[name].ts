@@ -1,14 +1,17 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import store from '../../../service'
 
-
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const {
-    query: { name, category },
+    query: { name, category }
   } = req
 
-
-  if (!name || !category || Array.isArray(name) || Array.isArray(category)) {
+  if (
+    name !== '' ||
+    category !== '' ||
+    Array.isArray(name) ||
+    Array.isArray(category)
+  ) {
     res.status(400)
     return
   }
@@ -18,16 +21,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     const newest: Record<string, any> = {}
 
-    materials.forEach(m => {
+    materials.forEach((m) => {
       if (newest[m.name] === undefined) {
         newest[m.name] = {
           ...m,
-          tags: m.tags.split(',').filter(t => !!t)
+          tags: m.tags.split(',').filter((t) => t !== '')
         }
       } else if (+newest[m.name].ctm < +m.ctm) {
         newest[m.name] = {
           ...m,
-          tags: m.tags.split(',').filter(t => !!t)
+          tags: m.tags.split(',').filter((t) => t !== '')
         }
       }
     })

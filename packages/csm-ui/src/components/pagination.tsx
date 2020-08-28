@@ -3,7 +3,6 @@ import { useState, useMemo, useEffect } from 'react'
 import styled from 'styled-components'
 import tw from 'twin.macro'
 
-
 interface PaginationProps {
   pageSize?: number,
   total: number,
@@ -16,7 +15,6 @@ const Btn = styled.li<{ selected?: boolean }>`
 `
 
 function Pagination(props: PaginationProps) {
-
   const { pageSize = 6, total, onChange } = props
 
   const [currentPage, setCurrent] = useState(1)
@@ -25,7 +23,6 @@ function Pagination(props: PaginationProps) {
     setCurrent(1)
     if (onChange !== undefined) onChange(1, pageSize)
   }, [pageSize, total])
-
 
   const page = useMemo(() => {
     const all = []
@@ -73,14 +70,14 @@ function Pagination(props: PaginationProps) {
   return (
     <ul className="flex space-x-1 bg-white justify-end py-2 px-4 ml-4 mb-8">
       {liEL(before)}
-      {!mid.length ? null :
-        <>
+      {!mid.length ? null
+        : <>
           <Btn>•••</Btn>
           {liEL(mid)}
         </>
       }
-      {!after.length ? null :
-        <>
+      {!after.length ? null
+        : <>
           <Btn>•••</Btn>
           {liEL(after)}
         </>

@@ -1,5 +1,5 @@
 {
-  "name": "@tone/csm-ui",
+  "name": "@tone./csm-ui",
   "version": "1.0.0-alpha.0",
   "files": [
     ".next/**/*"
@@ -18,7 +18,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@tone/csm-core": "^1.0.0-alpha.0",
+    "@tone./csm-core": "^1.0.0-alpha.0",
     "fs-extra": "^9.0.1",
     "next": "^9.5.2",
     "react": "^16.13.1",

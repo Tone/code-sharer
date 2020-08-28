@@ -1,13 +1,13 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import tw from 'twin.macro'
-import { Download } from 'react-feather';
+import { Download } from 'react-feather'
 import { useRecoilState } from 'recoil'
 import { modalState } from './store'
 import useFetch from './use_fetch'
 import Pagination from './pagination'
 
-const Tag = styled.li<{ selected?: boolean }>`
+const Tag = styled.li<{ selected: boolean }>`
   ${tw`text-xs border px-4 py-1 inline-block cursor-pointer mx-1 mb-2 transition-colors duration-500 hover:border-green-500 hover:text-green-500 `};
   ${props => props.selected ? tw`bg-green-500 text-white hover:text-white` : ''};
 `
@@ -16,7 +16,7 @@ function Category(props: { category: any, project?: string }) {
   const [modalChildren, setModal] = useRecoilState(modalState)
 
   const { category, project } = props
-  const { val: { description, position, }, repo, name } = category
+  const { val: { description, position }, repo, name } = category
 
   const materials = useFetch(`/api/repo/${repo}?category=${name}`)
 
@@ -25,7 +25,7 @@ function Category(props: { category: any, project?: string }) {
 
   const tags: string[] = useMemo(() => {
     if (materials === undefined) return []
-    return Array.from(new Set(materials.reduce((ac: string[], cu) => {
+    return Array.from(new Set(materials.reduce((ac: string[], cu: any) => {
       return ac.concat(cu.tags || [])
     }, [])))
   }, [materials])
@@ -34,17 +34,14 @@ function Category(props: { category: any, project?: string }) {
 
   const filterMaterials = useMemo(() => {
     if (materials === undefined) return []
-    return materials.filter(m => {
+    return materials.filter((m: any) => {
       return m.name.includes(input) && Array.from(selectedTags).every(t => m.tags.includes(t))
     })
-
   }, [materials, selectedTags, input])
-
 
   const currentMaterials = useMemo(() => {
     return filterMaterials.slice((page - 1) * pageSize, page * pageSize)
   }, [filterMaterials, page, pageSize])
-
 
   const tagClick = useCallback(
     (tag: string) => {
@@ -53,7 +50,7 @@ function Category(props: { category: any, project?: string }) {
       else tagsCopy.add(tag)
       setSelectedTags(tagsCopy)
     },
-    [selectedTags],
+    [selectedTags]
   )
 
   const paginationChange = (page: number, pageSize: number) => {
@@ -64,14 +61,13 @@ function Category(props: { category: any, project?: string }) {
 
   const downloadStatus = useFetch(downloadUrl)
 
-  const download = (material, dir: string) => {
+  const download = (material: any, dir: string) => {
     setDownloadUrl(`/api/material?r=${repo}&c=${name}&n=${material.name}&d=${dir}`)
   }
 
-  const dirRef = useRef()
+  const dirRef = useRef<any>()
 
   const [modalMaterial, setModalMaterial] = useState(null)
-
 
   useEffect(() => {
     if (!modalMaterial) return
@@ -93,13 +89,11 @@ function Category(props: { category: any, project?: string }) {
         {downloadStatus === undefined ? 'Download...' : 'Complete'}
       </div>
     </div>)
-
   }, [modalMaterial, downloadUrl, downloadStatus])
 
   useEffect(() => {
     if (!modalChildren) setModalMaterial(null)
   }, [modalChildren])
-
 
   return <div className="flex flex-col max-h-full">
     <div className="bg-white p-4">
@@ -113,7 +107,7 @@ function Category(props: { category: any, project?: string }) {
       </ul>
     </div>
     <div className="m-4 flex-1 flex flex-wrap -mx-1 px-4 items-stretch overflow-y-scroll">
-      {currentMaterials.map(m => (
+      {currentMaterials.map((m: any) => (
         <div key={m.name} className="md:w-1/3 sm:w-full p-1">
           <div className="text-xs border p-2 bg-white my-2 transition-shadow duration-500 hover:shadow h-full">
             <div className="group h-32 bg-gray-400 relative hover:bg-black hover:bg-opacity-25 flex justify-center items-center transition duration-500">
@@ -132,6 +126,5 @@ function Category(props: { category: any, project?: string }) {
     <Pagination total={filterMaterials.length} pageSize={pageSize} onChange={paginationChange} />
   </div>
 }
-
 
 export default Category

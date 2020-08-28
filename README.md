@@ -7,32 +7,14 @@
 - nodejs 10.0.0 以上
 - git
 
-### 使用
-
-配置全局 `.npmrc`或者`.yarnrc`
-
-```sh
-@tone:registry=https://npm.pkg.github.com
-```
-
-或者执行
-
-```sh
-# npm
-npm config set @tone:registry https://npm.pkg.github.com -g
-
-# yarn
-yarn config set @tone:registry https://npm.pkg.github.com -g
-
-```
-
 ### 项目结构
 
 - [x] `csm-cli` : 提供终端命令操作
   - [使用文档](./packages/csm-cli/README.md)
 - [x] `csm-core` : 实现核心功能模块
   - [使用文档](./packages/csm-core/README.md)
-- [ ] `csm-ui`: 提供网页界面
+- [x] `csm-ui`: 提供网页界面
+  - [使用文档](./packages/csm-ui/README.md)
 
 ### 项目约束
 
