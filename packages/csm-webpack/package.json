@@ -1,0 +1,33 @@
+{
+  "name": "@tone./csm-webpack",
+  "version": "1.0.0-alpha.0",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "start": "ts-node __test__/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tone/code-sharer.git",
+    "directory": "packages/csm-webpack"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "/lib/**/*"
+  ],
+  "dependencies": {
+    "@tone./csm-ui": "^1.0.0-alpha.0",
+    "safe-require": "^1.0.4"
+  },
+  "peerDependencies": {
+    "webpack": "^4.44.1"
+  },
+  "devDependencies": {
+    "@types/memory-fs": "^0.3.2",
+    "@types/webpack": "^4.41.21",
+    "html-webpack-plugin": "^4.4.1",
+    "ts-node": "^9.0.0"
+  }
+}

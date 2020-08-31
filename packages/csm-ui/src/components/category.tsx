@@ -7,9 +7,9 @@ import { modalState } from './store'
 import useFetch from './use_fetch'
 import Pagination from './pagination'
 
-const Tag = styled.li<{ selected: boolean }>`
+const Tag = styled.li<{ selected?: boolean }>`
   ${tw`text-xs border px-4 py-1 inline-block cursor-pointer mx-1 mb-2 transition-colors duration-500 hover:border-green-500 hover:text-green-500 `};
-  ${props => props.selected ? tw`bg-green-500 text-white hover:text-white` : ''};
+  ${props => props.selected ?? props.selected !== undefined ? tw`bg-green-500 text-white hover:text-white` : ''};
 `
 
 function Category(props: { category: any, project?: string }) {
@@ -25,7 +25,7 @@ function Category(props: { category: any, project?: string }) {
 
   const tags: string[] = useMemo(() => {
     if (materials === undefined) return []
-    return Array.from(new Set(materials.reduce((ac: string[], cu: any) => {
+    return Array.from(new Set(materials.reduce((ac: string[], cu) => {
       return ac.concat(cu.tags || [])
     }, [])))
   }, [materials])
@@ -34,7 +34,7 @@ function Category(props: { category: any, project?: string }) {
 
   const filterMaterials = useMemo(() => {
     if (materials === undefined) return []
-    return materials.filter((m: any) => {
+    return materials.filter(m => {
       return m.name.includes(input) && Array.from(selectedTags).every(t => m.tags.includes(t))
     })
   }, [materials, selectedTags, input])
@@ -61,11 +61,11 @@ function Category(props: { category: any, project?: string }) {
 
   const downloadStatus = useFetch(downloadUrl)
 
-  const download = (material: any, dir: string) => {
+  const download = (material, dir: string) => {
     setDownloadUrl(`/api/material?r=${repo}&c=${name}&n=${material.name}&d=${dir}`)
   }
 
-  const dirRef = useRef<any>()
+  const dirRef = useRef()
 
   const [modalMaterial, setModalMaterial] = useState(null)
 
@@ -107,7 +107,7 @@ function Category(props: { category: any, project?: string }) {
       </ul>
     </div>
     <div className="m-4 flex-1 flex flex-wrap -mx-1 px-4 items-stretch overflow-y-scroll">
-      {currentMaterials.map((m: any) => (
+      {currentMaterials.map(m => (
         <div key={m.name} className="md:w-1/3 sm:w-full p-1">
           <div className="text-xs border p-2 bg-white my-2 transition-shadow duration-500 hover:shadow h-full">
             <div className="group h-32 bg-gray-400 relative hover:bg-black hover:bg-opacity-25 flex justify-center items-center transition duration-500">
