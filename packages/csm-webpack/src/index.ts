@@ -108,7 +108,7 @@ class CSMServiceWebpackPlugin {
         () => {
           console.log(this.port, this.exec)
           if (compiler.options.mode === 'development') {
-            const service = spawn('npm', ['run', 'dev', '--', '-p', this.port], {
+            const service = spawn('npm', ['run', 'start', '--', '-p', this.port], {
               cwd: this.exec
             })
             service.stdout.on('data', data => console.log('[CSM_SERVICE]:', data.toString()))

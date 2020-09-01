@@ -8,7 +8,11 @@ import useFetch, { fetcher } from '../components/use_fetch'
 import Category from '../components/category'
 import { GetServerSideProps } from 'next'
 
+import { Repository } from '@tone./csm-core'
+
 import store from '../service'
+
+type RepositoryConfig = ReturnType<Repository['getConfig']>
 
 const RepoCard = styled('div')`
   ${tw`text-base mb-2`};
@@ -33,16 +37,20 @@ function HomePage(props: { storages: string[], project?: string }) {
   const { storages } = props
   const [curStorage, setCurStorage] = useState(storages[0])
 
-  const [curRepo, setCurRepo] = useState<any>(null)
-  const repositories = useFetch(`/api/repos?s=${curStorage}`)
+  const [curRepo, setCurRepo] = useState<RepositoryConfig | null>(null)
+  const repositories: RepositoryConfig[] | undefined = useFetch(`/api/repos?s=${curStorage}`)
 
   useEffect(() => {
-    if (repositories?.length) {
+    if (repositories !== undefined && repositories.length !== 0) {
       setCurRepo(repositories[0])
     }
   }, [repositories])
 
-  const [curCategory, setCurCategory] = useState<any>()
+  const [curCategory, setCurCategory] = useState<{
+    val: any,
+    name: string,
+    repo: string
+  } | null>(null)
 
   function handleCategory(name: string) {
     if (curRepo !== null) {
@@ -91,9 +99,9 @@ function HomePage(props: { storages: string[], project?: string }) {
         <label className="w-full mb-2 -ml-2">
           Repository:
         </label>
-        <select className="w-full flex-1 outline-none border-gray-400 pl-2 border" value={curRepo ? curRepo.repository : ''} onChange={e => {
-          const repo = repositories.find((r: any) => r.repository === e.target.value)
-          setCurRepo(repo)
+        <select className="w-full flex-1 outline-none border-gray-400 pl-2 border" value={curRepo !== null ? curRepo.repository : ''} onChange={e => {
+          const repo = (repositories ?? []).find((r: RepositoryConfig) => r.repository === e.target.value)
+          setCurRepo(repo ?? null)
         }}>
           {(repositories ?? []).map((r: any) => (
             <option value={r.repository} key={r.repository}>
@@ -102,24 +110,24 @@ function HomePage(props: { storages: string[], project?: string }) {
           ))
           }
         </select>
-        {!curRepo ? null
+        {curRepo === null ? null
           : <div className="w-full my-2">
             <RepoCard>
               <h5>Env:</h5>
               <ul>
-                {curRepo.env.map((e: any) => <Label key={e.exec}>{e.exec}:{e.version}</Label>)}
+                {(curRepo.env ?? []).map((e: any) => <Label key={e.exec}>{e.exec}:{e.version}</Label>)}
               </ul>
             </RepoCard>
             <RepoCard>
               <h5>Package:</h5>
               <ul>
-                {curRepo.package.map((p: any) => <Label key={p.name}>{p.name}:{p.version}</Label>)}
+                {(curRepo.package ?? []).map((p: any) => <Label key={p.name}>{p.name}:{p.version}</Label>)}
               </ul>
             </RepoCard>
           </div>
         }
       </div>
-      {!curRepo ? null
+      {curRepo === null ? null
         : <div className="text-base">
           <h5>Category:</h5>
           <ul>
@@ -129,7 +137,7 @@ function HomePage(props: { storages: string[], project?: string }) {
       }
     </aside>
     <main className="bg-gray-100 flex-1">
-      {!curCategory ? null
+      {curCategory === null ? null
         : <Category category={curCategory} project={props.project} />
       }
     </main>

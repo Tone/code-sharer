@@ -12,7 +12,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    if (s !== '') {
+    if (s !== undefined && s !== '') {
       await store.refresh(s)
     } else {
       await store.init(false)

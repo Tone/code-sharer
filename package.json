@@ -9,7 +9,7 @@
     "build:ui": "yarn workspace @tone./csm-ui run build",
     "build": "yarn build:cli && yarn build:ui",
     "prebuild": "yarn build-clean",
-    "lint": "eslint \"packages/*/src/**/*.{js,ts}\" \"packages/*/__test__/**/*.{js,ts}\" \"scripts/**/*.{js,ts}\" --quiet --fix",
+    "lint": "eslint \"packages/*/src/**/*.{js,ts,tsx}\" \"packages/*/__test__/**/*.{js,ts}\" \"scripts/**/*.{js,ts}\" --quiet --fix",
     "doc:html": "yarn workspaces run typedoc src/ --target ES6 --mode file --out docs",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
     "pretest": "yarn build",
@@ -29,7 +29,7 @@
       "prettier --write",
       "git add"
     ],
-    "*.{js,ts}": [
+    "*.{js,ts,tsx}": [
       "eslint --quiet --fix",
       "prettier --parser=typescript --write",
       "git add"

@@ -11,7 +11,7 @@ interface PaginationProps {
 
 const Btn = styled.li<{ selected?: boolean }>`
   ${tw`text-xs border w-8 h-8 leading-8 text-center cursor-pointer transition-colors duration-500 hover:border-green-500 hover:text-green-500 `};
-  ${props => props.selected ? tw`bg-green-500 text-white hover:text-white` : ''};
+  ${props => props.selected === true ? tw`bg-green-500 text-white hover:text-white` : ''};
 `
 
 function Pagination(props: PaginationProps) {
@@ -70,13 +70,13 @@ function Pagination(props: PaginationProps) {
   return (
     <ul className="flex space-x-1 bg-white justify-end py-2 px-4 ml-4 mb-8">
       {liEL(before)}
-      {!mid.length ? null
+      {mid.length === 0 ? null
         : <>
           <Btn>•••</Btn>
           {liEL(mid)}
         </>
       }
-      {!after.length ? null
+      {after.length === 0 ? null
         : <>
           <Btn>•••</Btn>
           {liEL(after)}

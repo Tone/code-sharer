@@ -7,8 +7,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   } = req
 
   if (
-    name !== '' ||
-    category !== '' ||
+    name === '' || name === undefined ||
+    category === '' || category === undefined ||
     Array.isArray(name) ||
     Array.isArray(category)
   ) {

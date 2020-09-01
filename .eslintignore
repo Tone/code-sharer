@@ -11,3 +11,4 @@
 jest.config.js
 **/docs/
 *.config.js
+**/dist/*

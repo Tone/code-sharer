@@ -146,7 +146,7 @@ class Store {
   async getMaterials(repo: string, category: string) {
     const { repository } = this.repos
 
-    if (repository[repo] !== undefined) return []
+    if (repository[repo] === undefined) return []
 
     const record = await repository[repo].searchMaterial('', category)
 
@@ -156,7 +156,7 @@ class Store {
   async findMaterial(repo: string, category: string, name: string) {
     const { repository } = this.repos
 
-    if (repository[repo] !== undefined) return null
+    if (repository[repo] === undefined) return null
 
     return await repository[repo].find(name, category)
   }

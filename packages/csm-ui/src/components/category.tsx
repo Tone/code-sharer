@@ -7,6 +7,14 @@ import { modalState } from './store'
 import useFetch from './use_fetch'
 import Pagination from './pagination'
 
+import { History } from '@tone./csm-core'
+
+type RepositoryCSV = ReturnType<typeof History.transform>
+
+type Material = RepositoryCSV & {
+  tags: string[]
+}
+
 const Tag = styled.li<{ selected?: boolean }>`
   ${tw`text-xs border px-4 py-1 inline-block cursor-pointer mx-1 mb-2 transition-colors duration-500 hover:border-green-500 hover:text-green-500 `};
   ${props => props.selected ?? props.selected !== undefined ? tw`bg-green-500 text-white hover:text-white` : ''};
@@ -18,15 +26,16 @@ function Category(props: { category: any, project?: string }) {
   const { category, project } = props
   const { val: { description, position }, repo, name } = category
 
-  const materials = useFetch(`/api/repo/${repo}?category=${name}`)
+  const materials: Material[] | undefined = useFetch(`/api/repo/${repo}?category=${name}`)
 
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
   const [input, setInput] = useState('')
 
   const tags: string[] = useMemo(() => {
     if (materials === undefined) return []
+
     return Array.from(new Set(materials.reduce((ac: string[], cu) => {
-      return ac.concat(cu.tags || [])
+      return ac.concat(cu.tags)
     }, [])))
   }, [materials])
 
@@ -61,16 +70,17 @@ function Category(props: { category: any, project?: string }) {
 
   const downloadStatus = useFetch(downloadUrl)
 
-  const download = (material, dir: string) => {
+  const download = (material: Material | null, dir: string) => {
+    if (material === null) return
     setDownloadUrl(`/api/material?r=${repo}&c=${name}&n=${material.name}&d=${dir}`)
   }
 
-  const dirRef = useRef()
+  const dirRef = useRef<any>()
 
-  const [modalMaterial, setModalMaterial] = useState(null)
+  const [modalMaterial, setModalMaterial] = useState<Material | null>(null)
 
   useEffect(() => {
-    if (!modalMaterial) return
+    if (modalMaterial === null) return
 
     setModal(<div>
       <h5 className="text-base mb-4">Project Path:<br /> <span className="text-sm text-gray-500">{project}</span></h5>
@@ -85,14 +95,14 @@ function Category(props: { category: any, project?: string }) {
           Close
         </button>
       </div>
-      <div className={`p-4 bg-black bg-opacity-50 text-2xl mt-4 ${downloadUrl ? '' : 'hidden'}`}>
+      <div className={`p-4 bg-black bg-opacity-50 text-2xl mt-4 ${downloadUrl !== null ? '' : 'hidden'}`}>
         {downloadStatus === undefined ? 'Download...' : 'Complete'}
       </div>
     </div>)
   }, [modalMaterial, downloadUrl, downloadStatus])
 
   useEffect(() => {
-    if (!modalChildren) setModalMaterial(null)
+    if (modalChildren === null) setModalMaterial(null)
   }, [modalChildren])
 
   return <div className="flex flex-col max-h-full">

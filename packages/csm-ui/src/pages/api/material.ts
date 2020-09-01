@@ -7,9 +7,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     query: { r, c, n, d }
   } = req
   if (
-    r !== '' ||
-    c !== '' ||
-    n !== '' ||
+    r === '' || r === undefined ||
+    c === '' || c === undefined ||
+    n === '' || n === undefined ||
     Array.isArray(r) ||
     Array.isArray(c) ||
     Array.isArray(n)

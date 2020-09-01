@@ -6,7 +6,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     query: { s }
   } = req
 
-  if (s !== '' || Array.isArray(s)) {
+  if (s === undefined || s === '' || Array.isArray(s)) {
     res.status(400).send(null)
     return
   }
