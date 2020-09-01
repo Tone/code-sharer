@@ -4,10 +4,12 @@
     "packages/*"
   ],
   "scripts": {
+    "bootstrap": "lerna bootstrap",
     "build-clean": "rimraf ./packages/*/lib ./packages/*/tsconfig.tsbuildinfo",
     "build:cli": "yarn workspace @tone./csm-cli run tsc -b",
+    "build:webpack": "yarn workspace @tone./csm-webpack run tsc",
     "build:ui": "yarn workspace @tone./csm-ui run build",
-    "build": "yarn build:cli && yarn build:ui",
+    "build": "yarn build:cli && yarn build:ui && yarn build:webpack",
     "prebuild": "yarn build-clean",
     "lint": "eslint \"packages/*/src/**/*.{js,ts,tsx}\" \"packages/*/__test__/**/*.{js,ts}\" \"scripts/**/*.{js,ts}\" --quiet --fix",
     "doc:html": "yarn workspaces run typedoc src/ --target ES6 --mode file --out docs",

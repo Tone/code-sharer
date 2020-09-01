@@ -25,7 +25,6 @@
     "webpack": "^4.44.1"
   },
   "devDependencies": {
-    "@types/memory-fs": "^0.3.2",
     "@types/webpack": "^4.41.21",
     "html-webpack-plugin": "^4.4.1",
     "ts-node": "^9.0.0"

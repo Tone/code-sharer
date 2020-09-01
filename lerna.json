@@ -1,11 +1,18 @@
 {
-  "version": "1.0.0-alpha.0",
+  "version": "indenpendent",
   "npmClient": "yarn",
+  "useWorkspaces": true,
   "command": {
     "publish": {
-      "ignoreChanges": ["ignored-file", "*.md"],
-      "message": "chore(release): publish"
+      "message": "chore(release): publish",
+      "registry": "https://registry.npmjs.org/"
     }
   },
-  "packages": ["packages/*"]
+  "ignoreChanges": [
+    "*.md",
+    "**/__test__/**/*"
+  ],
+  "packages": [
+    "packages/*"
+  ]
 }
