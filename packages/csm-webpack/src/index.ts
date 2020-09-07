@@ -9,7 +9,8 @@ const execPath = path.join(process.cwd(), 'node_modules', '@tone./csm-ui')
 
 interface Options {
   port?: number,
-  exec?: string
+  exec?: string,
+  store?: string
 }
 
 function injectIframe(html: string, port: string) {
@@ -95,9 +96,11 @@ function injectIframe(html: string, port: string) {
 class CSMServiceWebpackPlugin {
   port: string
   exec: string
-  constructor(options: Options = { port: 3000, exec: execPath }) {
+  store?: string
+  constructor(options: Options = { port: 3000, exec: execPath, store: '' }) {
     this.port = options.port !== undefined ? `${options.port}` : '3000'
     this.exec = options.exec ?? execPath
+    this.store = options.store
   }
 
   apply(compiler: Compiler) {
@@ -106,10 +109,10 @@ class CSMServiceWebpackPlugin {
       compiler.hooks.afterEnvironment.tap(
         'CSMServiceWebpackPlugin',
         () => {
-          console.log(this.port, this.exec)
           if (compiler.options.mode === 'development') {
             const service = spawn('npm', ['run', 'start', '--', '-p', this.port], {
-              cwd: this.exec
+              cwd: this.exec,
+              env: this.store !== undefined ? { ...process.env, STORE_URL: this.store } : process.env
             })
             service.stdout.on('data', data => console.log('[CSM_SERVICE]:', data.toString()))
             service.stderr.on('data', data => console.log('[CSM_SERVICE]:', data.toString()))
