@@ -150,6 +150,7 @@ export default class Material extends Detector {
       this.dirName
     ]
 
+    // TODO catch error remove files
     await this.repository.record(record)
   }
 
