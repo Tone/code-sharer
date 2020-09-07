@@ -16,6 +16,10 @@
 - [x] `csm-ui`: 提供网页界面
   - [使用文档](./packages/csm-ui/README.md)
 
+### 结构图
+
+![流程图](./group.svg)
+
 ### 项目约束
 
 项目采用`toml`配置文件进行约束，分为：
