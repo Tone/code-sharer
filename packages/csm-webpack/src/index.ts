@@ -93,7 +93,7 @@ function injectIframe(html: string, port: string) {
   return strArr.join('')
 }
 
-class CSMServiceWebpackPlugin {
+export class CSMServiceWebpackPlugin {
   port: string
   exec: string
   store?: string
@@ -110,9 +110,9 @@ class CSMServiceWebpackPlugin {
         'CSMServiceWebpackPlugin',
         () => {
           if (compiler.options.mode === 'development') {
-            const service = spawn('npm', ['run', 'start', '--', '-p', this.port], {
+            const service = spawn('node', [this.exec], {
               cwd: this.exec,
-              env: this.store !== undefined ? { ...process.env, STORE_URL: this.store } : process.env
+              env: { ...process.env, STORE_URL: this.store, PORT: this.port, NODE_ENV: 'production', PROJECT: process.cwd() }
             })
             service.stdout.on('data', data => console.log('[CSM_SERVICE]:', data.toString()))
             service.stderr.on('data', data => console.log('[CSM_SERVICE]:', data.toString()))
@@ -122,7 +122,7 @@ class CSMServiceWebpackPlugin {
       )
       // auto inject html
       compiler.hooks.compilation.tap('CSMServiceWebpackPlugin', (compilation) => {
-        if (HtmlWebpackPlugin !== undefined) {
+        if (HtmlWebpackPlugin?.getHooks !== undefined) {
           HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
             'CSMServiceWebpackPlugin',
             (data: any, cb: Function) => {
@@ -132,10 +132,12 @@ class CSMServiceWebpackPlugin {
               cb(null, data)
             }
           )
+        } else if (HtmlWebpackPlugin === undefined) {
+          console.log('Not found HtmlWebpackPlugin, Please handle it manually')
+        } else if (HtmlWebpackPlugin.getHooks === undefined) {
+          console.log('HtmlWebpackPlugin version low, Please update or handle it manually')
         }
       })
     }
   }
 }
-
-export default CSMServiceWebpackPlugin

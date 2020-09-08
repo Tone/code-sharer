@@ -3,7 +3,7 @@ import webpack from 'webpack'
 import path from 'path'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 
-import CSMServiceWebpackPlugin from '../src'
+import { CSMServiceWebpackPlugin } from '../src'
 
 const compiler = webpack({
   mode: 'development',
@@ -13,10 +13,10 @@ const compiler = webpack({
     filename: 'bundle.js' // string
   },
   plugins: [
+    new HtmlWebpackPlugin(),
     new CSMServiceWebpackPlugin({
       exec: path.join(process.cwd(), '../../', 'node_modules', '@tone./csm-ui')
-    }),
-    new HtmlWebpackPlugin()
+    })
   ]
 })
 

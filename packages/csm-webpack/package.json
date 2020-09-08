@@ -1,6 +1,6 @@
 {
   "name": "@tone./csm-webpack",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-alpha.1",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -18,15 +18,15 @@
     "/lib/**/*"
   ],
   "dependencies": {
-    "@tone./csm-ui": "^1.0.0-alpha.0",
+    "@tone./csm-ui": "^1.0.0-alpha.1",
     "safe-require": "^1.0.4"
   },
   "peerDependencies": {
+    "html-webpack-plugin": "^4.4.1",
     "webpack": "^4.44.1"
   },
   "devDependencies": {
     "@types/webpack": "^4.41.21",
-    "html-webpack-plugin": "^4.4.1",
     "ts-node": "^9.0.0"
   }
 }

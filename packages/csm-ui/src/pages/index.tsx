@@ -150,7 +150,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   await store.init()
   return {
     props: {
-      project: process.cwd(),
+      project: process.env.PROJECT ?? process.cwd(),
       storages: Array.from(store.store)
     }
   }
