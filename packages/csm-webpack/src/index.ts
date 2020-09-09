@@ -110,7 +110,7 @@ export class CSMServiceWebpackPlugin {
         'CSMServiceWebpackPlugin',
         () => {
           if (compiler.options.mode === 'development') {
-            const service = spawn('node', [this.exec], {
+            const service = spawn('npm', ['run', 'start'], {
               cwd: this.exec,
               env: { ...process.env, STORE_URL: this.store, PORT: this.port, NODE_ENV: 'production', PROJECT: process.cwd() }
             })

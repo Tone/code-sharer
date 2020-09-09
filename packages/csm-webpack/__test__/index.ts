@@ -2,8 +2,9 @@ import webpack from 'webpack'
 
 import path from 'path'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
-
 import { CSMServiceWebpackPlugin } from '../src'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const WebpackDevServer = require('webpack-dev-server')
 
 const compiler = webpack({
   mode: 'development',
@@ -20,9 +21,13 @@ const compiler = webpack({
   ]
 })
 
-compiler.watch({
-  // Example watchOptions
-  aggregateTimeout: 300,
-  poll: undefined
-}, () => { // Stats Object
+const server = new WebpackDevServer(compiler, {
+  open: true,
+  stats: {
+    colors: true
+  }
+})
+
+server.listen(8080, '127.0.0.1', () => {
+  console.log('Starting server on http://localhost:8080')
 })

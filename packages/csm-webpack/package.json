@@ -1,6 +1,6 @@
 {
   "name": "@tone./csm-webpack",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -27,6 +27,8 @@
   },
   "devDependencies": {
     "@types/webpack": "^4.41.21",
-    "ts-node": "^9.0.0"
+    "html-webpack-plugin": "^4.4.1",
+    "ts-node": "^9.0.0",
+    "webpack-dev-server": "^3.11.0"
   }
 }
