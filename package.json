@@ -4,7 +4,6 @@
     "packages/*"
   ],
   "scripts": {
-    "bootstrap": "lerna bootstrap",
     "build-clean": "rimraf ./packages/*/lib ./packages/*/tsconfig.tsbuildinfo",
     "build:cli": "yarn workspace @tone./csm-cli run tsc -b",
     "build:webpack": "yarn workspace @tone./csm-webpack run tsc",
@@ -17,7 +16,6 @@
     "pretest": "yarn build",
     "test": "jest --forceExit --coverage --verbose",
     "update:deps": "yarn upgrade-interactive --latest",
-    "prepublish": "lerna bootstrap",
     "publish": "lerna publish from-package --yes"
   },
   "husky": {
