@@ -11,6 +11,7 @@ import { GetServerSideProps } from 'next'
 import { Repository } from '@tone./csm-core'
 
 import store from '../service'
+import { currentExecDir } from '../service/config'
 
 type RepositoryConfig = ReturnType<Repository['getConfig']>
 
@@ -150,7 +151,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   await store.init()
   return {
     props: {
-      project: process.env.PROJECT ?? process.cwd(),
+      project: currentExecDir,
       storages: Array.from(store.store)
     }
   }

@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import store from '../../service'
+import { currentExecDir } from '../../service/config'
 import path from 'path'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -25,7 +26,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(500).send({ msg: 'material does not exist' })
       return
     }
-    await material.pick(path.join(process.cwd(), d as string))
+    await material.pick(path.join(currentExecDir, d as string))
     res.status(200).send({})
   } catch (e) {
     res.status(500).send(e)

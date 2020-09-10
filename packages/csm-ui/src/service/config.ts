@@ -8,3 +8,5 @@ export const officialRemoteStoreListUrl = 'git@github.com:Tone/csm-storage.git'
 export const customRemoteStoreListUrl = process.env.STORE_URL ?? ''
 
 export const cacheFile = path.join(os.tmpdir(), '.cms_ui', 'cache.json')
+
+export const currentExecDir = process.env.PROJECT ?? process.cwd()
