@@ -2,6 +2,9 @@ import webpack from 'webpack'
 
 import path from 'path'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// const HtmlWebpackPlugin = require(webpack-html3')
+
 import { CSMServiceWebpackPlugin } from '../src'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const WebpackDevServer = require('webpack-dev-server')

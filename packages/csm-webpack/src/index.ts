@@ -5,6 +5,8 @@ import path from 'path'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const HtmlWebpackPlugin = require('safe-require')('html-webpack-plugin')
 
+// const HtmlWebpackPlugin = require('safe-require')(webpack-html3')
+
 const execPath = path.join(process.cwd(), 'node_modules', '@tone./csm-ui')
 
 interface Options {
@@ -107,7 +109,7 @@ export class CSMServiceWebpackPlugin {
     if (compiler.options.mode === 'development') {
       // start server
       compiler.hooks.afterEnvironment.tap(
-        'CSMServiceWebpackPlugin',
+        this.constructor.name,
         () => {
           if (compiler.options.mode === 'development') {
             const service = spawn('npm', ['run', 'start'], {
@@ -121,21 +123,28 @@ export class CSMServiceWebpackPlugin {
         }
       )
       // auto inject html
-      compiler.hooks.compilation.tap('CSMServiceWebpackPlugin', (compilation) => {
+      compiler.hooks.compilation.tap(this.constructor.name, (compilation) => {
         if (HtmlWebpackPlugin?.getHooks !== undefined) {
           HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
-            'CSMServiceWebpackPlugin',
-            (data: any, cb: Function) => {
+            this.constructor.name,
+            (htmlPluginData: any, cb: Function) => {
               // Manipulate the content
-              data.html = injectIframe(data.html, this.port)
+              htmlPluginData.html = injectIframe(htmlPluginData.html, this.port)
               // Tell webpack to move on
-              cb(null, data)
+              cb(null, htmlPluginData)
             }
           )
         } else if (HtmlWebpackPlugin === undefined) {
           console.log('Not found HtmlWebpackPlugin, Please handle it manually')
         } else if (HtmlWebpackPlugin.getHooks === undefined) {
-          console.log('HtmlWebpackPlugin version low, Please update or handle it manually')
+          const compilationHooks = compilation.hooks as any
+          compilationHooks.htmlWebpackPluginBeforeHtmlProcessing.tap(
+            this.constructor.name,
+            (htmlPluginData: any) => {
+              htmlPluginData.html = injectIframe(htmlPluginData.html, this.port)
+              return htmlPluginData
+            }
+          )
         }
       })
     }
