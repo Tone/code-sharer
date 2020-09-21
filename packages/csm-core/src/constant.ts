@@ -10,16 +10,8 @@ export const REMOTE_NAME = 'origin'
 
 export const DEFAULT_BRANCH = 'master'
 
-export const CONFIG_EXT = '.toml'
+export const WIP_BRANCH = 'master'
 
-export const DEFAULT_NAME_STYLE = '[name]@[category].[author:8]'
-
-export const DEFAULT_MATERIAL_CONFIG_NAME = 'info.toml'
-
-export const HISTORY_RECORD_EXT = '.csv'
-
-export const HISTORY_RECORD_CSV_OPTION = {
-  delimiter: '|'
-}
+export const DEFAULT_MATERIAL_CONFIG_NAME = 'info.json'
 
 export const SOURCE_DIR = 'src'

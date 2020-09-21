@@ -1,207 +1,128 @@
 import path from 'path'
 import fs from 'fs-extra'
 
-import Config, { MaterialConfig } from './config'
-import Detector, { DetectorType } from './detector'
-import Repository from './repository'
 import Storage from './storage'
+import Template from './template'
 import {
-  DEFAULT_NAME_STYLE,
   DEFAULT_MATERIAL_CONFIG_NAME,
-  SOURCE_DIR
+  SOURCE_DIR,
+  DEFAULT_BRANCH,
+  WIP_BRANCH
 } from './constant'
-import { stringify, allFiles } from './utils'
-import { recordRow } from './history'
 
-type nameStyle = Pick<
-  MaterialConfig,
-  'name' | 'author' | 'category' | 'repository'
->
+interface Dependencies {
+  name: string
+  version: string
+}
 
-/**
- * 提供物料的基础操作，由仓库及物料约束文件构造，管理物料类型和提交记录
- * - 环境及依赖包检测
- * - 校验规则
- * - 物料提交及检出
- */
-export default class Material extends Detector {
-  static parse(dir: string) {
-    const configPath = path.resolve(dir, DEFAULT_MATERIAL_CONFIG_NAME)
-    return new Config<MaterialConfig>(configPath).getConfig()
+interface MaterialInfo {
+  name: string
+  description: string
+  tags: string[]
+  code?: string
+  dep: Dependencies[]
+}
+
+interface MaterialConfig {
+  stable: string
+  beta: string
+}
+
+export default class Material {
+  static async init(
+    dir: string,
+    url?: string,
+    config: MaterialConfig = { stable: DEFAULT_BRANCH, beta: WIP_BRANCH }
+  ) {
+    const storage = await Storage.init(dir, config.stable, url)
+    return new Material(storage, config)
   }
 
-  static async init(config: MaterialConfig) {
-    const repository = await Repository.find(config.repository)
-    if (repository === null) {
-      return null
-    }
+  private readonly storage: Storage
+  private readonly config: MaterialConfig
+  log: Map<string, MaterialInfo>
 
-    return new Material(repository, config)
-  }
-
-  private readonly repository: Repository
-  readonly config: MaterialConfig
-  private readonly dirName: string
-
-  private dir = ''
-
-  constructor(repository: Repository, config: MaterialConfig) {
-    super()
-    this.repository = repository
+  constructor(storage: Storage, config: MaterialConfig) {
+    this.storage = storage
     this.config = config
-
-    this.dirName = this.getDirName()
+    this.log = this.count()
   }
 
-  async checkExist() {
-    const { name, category } = this.config
-    await this.repository.update()
-    const records = await this.repository.searchMaterial(name, category)
-    return records.length !== 0
+  async create(template: Template, dir: string) {
+    fs.ensureDirSync(dir)
+    return await template.init(dir)
   }
 
-  async checkDir(src: string[]) {
-    const { category } = this.config
-    const { category: categories, repository } = this.repository.getConfig()
-    if (categories[category] === undefined) {
-      throw new Error(
-        `category ${category} does not exist in repository ${repository}`
-      )
+  async checkExist(name: string, rest = true) {
+    await this.storage.fetch()
+    await this.storage.branch(this.config.beta)
+    const exist = fs.existsSync(path.join(this.storage.dir, name))
+    if (rest) {
+      await this.storage.branch(this.config.stable)
     }
-
-    const { dir } = categories[category]
-    return await this.getDetectorByType(DetectorType.dir)(src, dir)
+    return exist
   }
 
-  async checkField() {
-    const { category } = this.config
-    const { category: categories, repository } = this.repository.getConfig()
-    if (categories[category] === undefined) {
-      throw new Error(
-        `category ${category} does not exist in repository ${repository}`
-      )
+  async publish(files: string[], info: MaterialInfo) {
+    await this.storage.fetch()
+    await this.storage.branch(this.config.beta)
+
+    try {
+      if (await this.checkExist(info.name, false)) {
+        throw new Error(`${info.name} already exists
+      `)
+      }
+      const commitHash = await this.storage.commit(files, `Add ${info.name}`)
+      await this.storage.push(commitHash, undefined, this.config.beta)
+    } finally {
+      await this.storage.branch(this.config.stable)
     }
-    const { checklist } = categories[category]
-    if (checklist === undefined) return
-    return await this.getDetectorByType(DetectorType.checklist)(
-      checklist,
-      this.config
+  }
+
+  search(name: string, tag: string) {
+    return Array.from(this.log.values()).filter(
+      (info) =>
+        info.name.includes(name) && info.tags.some((t) => t.includes(tag))
     )
   }
 
-  async checkPackage() {
-    await this.repository.checkPackage()
-    if (this.config.package === undefined) return
-    return await this.getDetectorByType(DetectorType.package)(
-      this.config.package
-    )
+  async download(name: string, target: string) {
+    const srcDir = path.join(this.storage.dir, name, SOURCE_DIR)
+    const targetDir = path.join(target, name)
+    return await fs.copy(srcDir, targetDir)
   }
 
-  private getSrcFileDir(files: string[]) {
-    // TODO need rewrite find min length
-    files.sort((a, b) => a.length - b.length)
-    const srcDir = path.dirname(files[0])
-    return srcDir
+  count() {
+    const storageDir = this.storage.dir
+    const dirs = fs.readdirSync(storageDir)
+    const log: Map<string, MaterialInfo> = new Map()
+
+    return dirs.reduce((log, dir) => {
+      log.set(dir, this.parse(dir))
+      return log
+    }, log)
   }
 
-  private getDirName() {
-    const style = this.repository.getConfig().style ?? DEFAULT_NAME_STYLE
-    const dirName = stringify(
-      style === '' ? DEFAULT_NAME_STYLE : style,
-      this.config as nameStyle
-    )
-    return dirName
+  parse(dir: string): MaterialInfo {
+    const infoFile = path.join(dir, DEFAULT_MATERIAL_CONFIG_NAME)
+    return fs.readJSONSync(infoFile)
   }
 
-  async getDir() {
-    if (this.dir !== '') return this.dir
-    const storage = Storage.storage()
-    const repository = this.config.repository
-    this.dir = path.resolve(storage.dir, repository, this.dirName)
-    return this.dir
+  async update() {
+    const curHead = await this.storage.head()
+    const remoteHead = await (await this.storage.fetch()).head()
+
+    if (curHead !== remoteHead) {
+      await this.storage.pull()
+      this.log = this.count()
+    }
   }
 
-  async genConfig() {
-    const dir = await this.getDir()
-    const configPath = path.resolve(dir, DEFAULT_MATERIAL_CONFIG_NAME)
-    const config = new Config<MaterialConfig>(configPath)
-    await config.genConfig(this.config)
-    return configPath
+  updateLog(name: string, info: MaterialInfo) {
+    this.log.set(name, info)
   }
 
-  private message() {
-    return `Update ${this.config.name} for ${this.config.repository} repository`
-  }
-
-  private async commit(files: string[]) {
-    const storage = Storage.storage()
-    return await storage.commit(files, this.message())
-  }
-
-  private async record(files: string[]) {
-    const commitId = await this.commit(files)
-    const record: recordRow = [
-      this.config.name,
-      this.config.category,
-      this.config.author,
-      commitId,
-      this.config.tags?.join() ?? '',
-      this.config.description ?? '',
-      this.dirName
-    ]
-
-    // TODO catch error remove files
-    await this.repository.record(record)
-  }
-
-  async submitCheck(relativeFiles: string[]) {
-    await this.checkField()
-    await this.checkDir(relativeFiles)
-  }
-
-  async submit(srcDir: string) {
-    const dir = await this.getDir()
-    const relativeFiles = await (await fs.readdir(srcDir)).map((f) =>
-      path.relative(srcDir, f)
-    )
-    await this.submitCheck(relativeFiles)
-    await fs.copy(srcDir, path.join(dir, SOURCE_DIR))
-    await this.genConfig()
-
-    const files = allFiles(dir)
-    await this.record(files)
-  }
-
-  async submitFile(files: string[]) {
-    const srcFileDir = this.getSrcFileDir(files)
-    const dir = await this.getDir()
-    const dirFiles: string[] = []
-    const relativeFiles: string[] = []
-
-    files.forEach((file) => {
-      const relativeFile = path.relative(srcFileDir, file)
-      const dirFile = path.join(dir, SOURCE_DIR, relativeFile)
-      relativeFiles.push(relativeFile)
-      dirFiles.push(dirFile)
-    })
-    await this.submitCheck(relativeFiles)
-
-    files.forEach((file, index) => {
-      fs.copySync(file, dirFiles[index])
-    })
-    const configPath = await this.genConfig()
-    await this.record([...dirFiles, configPath])
-  }
-
-  async check() {
-    await this.repository.checkEnv()
-    await this.checkPackage()
-  }
-
-  async pick(targetDir: string) {
-    const dir = await this.getDir()
-    if (!fs.pathExistsSync(dir)) throw new Error(`${dir} does not exists`)
-    const srcDir = path.join(dir, SOURCE_DIR)
-    await fs.copy(srcDir, targetDir)
+  has(name: string) {
+    return this.log.has(name)
   }
 }

@@ -7,58 +7,43 @@ import {
   DEFAULT_BRANCH
 } from './constant'
 
-/**
- * 提供存储库基础操作
- * - 文件提交及版本生成
- * - 远端更新及推送
- * - 仓库信息
- * - 特定版本文件检出
- */
 export default class Storage {
   static async clone(url: string, dir = DEFAULT_REPOSITORY_PATH) {
-    await fs.ensureDir(dir)
     const repository = Git(dir)
-    await repository.clone(url, dir)
+    await repository.clone(url, dir, ['--depth', '1'])
     return new Storage(repository, dir)
   }
 
-  static async discover(dir = DEFAULT_REPOSITORY_PATH) {
+  static async init(
+    dir = DEFAULT_REPOSITORY_PATH,
+    branch = DEFAULT_BRANCH,
+    url?: string
+  ) {
     await fs.ensureDir(dir)
     const repository = Git(dir)
-    if (!(await repository.checkIsRepo())) {
-      await repository.init()
+    const isRepo = await repository.checkIsRepo()
+    let storage
+
+    if (isRepo) {
+      storage = new Storage(repository, dir)
+      await storage.branch(branch)
+      await storage.pull()
+      return storage
+    } else if (url !== undefined) {
+      storage = await Storage.clone(url, dir)
+      await storage.branch(branch)
+      return storage
     }
 
-    return new Storage(repository, dir)
-  }
-
-  static async init(dir = DEFAULT_REPOSITORY_PATH, url?: string) {
-    this.storageCache =
-      url !== undefined
-        ? await Storage.clone(url, dir)
-        : await Storage.discover(dir)
-    return this.storageCache
-  }
-
-  static async check(dir: string) {
-    if (!fs.pathExistsSync(dir)) {
-      throw new Error(`${dir} does not exist, please run init first `)
-    }
-    const repository = Git(dir)
-    if (!(await repository.checkIsRepo())) {
-      throw new Error('Storage does not init, please run init first ')
-    }
-  }
-
-  private static storageCache: null | Storage = null
-
-  static storage() {
-    if (Storage.storageCache !== null) return Storage.storageCache
-    throw new Error('Storage does not init, please run init first ')
+    await repository.init()
+    storage = new Storage(repository, dir)
+    await storage.branch(branch)
+    await storage.pull()
+    return storage
   }
 
   private readonly repository: SimpleGit
-  readonly dir: string
+  dir: string
 
   constructor(repository: SimpleGit, dir: string) {
     this.repository = repository
@@ -92,6 +77,10 @@ export default class Storage {
     return this
   }
 
+  async pull(remote = REMOTE_NAME, branch = DEFAULT_BRANCH) {
+    await this.repository.pull(remote, branch, ['-r'])
+  }
+
   async push(
     commitHash?: string,
     remote = REMOTE_NAME,
@@ -99,10 +88,9 @@ export default class Storage {
   ) {
     let remoteBranch = branch
     if (commitHash !== undefined) {
-      const nextHash = await this.nextCommit(commitHash)
-      remoteBranch = `${nextHash}:${branch}`
+      remoteBranch = `${commitHash}:${branch}`
     }
-    await this.repository.pull(remote, branch, ['-r'])
+    await this.pull(remote, branch)
     await this.repository.push(remote, remoteBranch)
     return this
   }
@@ -123,12 +111,11 @@ export default class Storage {
     return ''
   }
 
-  private async nextCommit(cur: string) {
-    const info = await this.repository.log([
-      '--reverse',
-      '--ancestry-path',
-      `${cur}^..HEAD`
-    ])
-    return info.all[1].hash
+  async head() {
+    return (await this.repository.status()).current
+  }
+
+  async branch(name: string, remote = REMOTE_NAME) {
+    return await this.repository.checkoutBranch(name, `${remote}/${name}`)
   }
 }

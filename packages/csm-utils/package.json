@@ -1,5 +1,5 @@
 {
-  "name": "@tone./csm-core",
+  "name": "@tone./csm-utils",
   "version": "1.0.0-alpha.0",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "fs-extra": "^9.0.0",
-    "simple-git": "^2.5.0"
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^8.1.0"

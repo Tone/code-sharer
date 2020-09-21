@@ -1,34 +1,55 @@
-import { Arguments, Argv, CommandModule } from 'yargs'
-import { Storage } from '@tone./csm-core'
 import fs from 'fs-extra'
-import { CONF_FILE } from './config'
+import prompts, { PromptObject } from 'prompts'
+import path from 'path'
+import Err from './err'
 
-class Init implements CommandModule {
-  readonly command = 'init [storageDir]'
-  readonly describe = 'Init local storage'
-  builder(argv: Argv) {
-    argv.positional('storageDir', {
-      describe: 'local storage dir',
-      type: 'string'
-    })
+export const command = 'init'
+export const describe = 'Init material storage'
 
-    argv.options({
-      remote: {
-        alias: 'r',
-        type: 'string',
-        describe: 'remote repository url',
-        require: false
-      }
-    })
-    return argv
+const storageTemplate = [
+  {
+    title: 'vue',
+    value: '@tone./csm-template-vue'
   }
+]
 
-  async handler(args: Arguments) {
-    const storageDir = args.storageDir as string
-    const remoteUrl = args.remote as string
-    const { dir } = await Storage.init(storageDir, remoteUrl)
-    await fs.writeJSON(CONF_FILE, { dir })
+function existsDir(dir: string) {
+  const dirPath = path.join(process.cwd(), dir)
+
+  return fs.existsSync(dirPath) ? `${dirPath} already exists` : true
+}
+
+export async function handler() {
+  const questions: PromptObject[] = [
+    {
+      type: 'text',
+      name: 'name',
+      message: 'Please input material storage name',
+      validate: (val) => existsDir(val)
+    },
+    {
+      type: 'select',
+      name: 'templateDir',
+      message: 'Pick a template',
+      choices: storageTemplate,
+      initial: 1
+    }
+  ]
+
+  const { name, templateDir } = await prompts(questions)
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const template = require(templateDir)
+    const dir = path.join(process.cwd(), name)
+    await template.init(dir)
+  } catch (e) {
+    throw new Err('Init Err')
   }
 }
 
-export default new Init()
+export default {
+  command,
+  describe,
+  handler
+}

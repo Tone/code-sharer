@@ -3,32 +3,21 @@ import chalk from 'chalk'
 import figlet from 'figlet'
 import * as yargs from 'yargs'
 
-// TODO https://github.com/terkelg/prompts#readme
-import inquirer from 'inquirer'
-
 import CliErr from './err'
 import init from './init'
-import pick from './pick'
-import patch from './patch'
-import publish from './publish'
-import search from './search'
-import submit from './submit'
-import update from './update'
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const autocomplete = require('inquirer-autocomplete-prompt')
-
-inquirer.registerPrompt('autocomplete', autocomplete)
+// import download from './pick'
+// import publish from './publish'
+// import search from './search'
+// import create from './create'
 
 console.log(chalk.yellow(figlet.textSync('CSM', { horizontalLayout: 'full' })))
 
 const argv = yargs
   .command(init)
-  .command(pick)
-  .command(patch)
-  .command(publish)
-  .command(search)
-  .command(submit)
-  .command(update)
+  // .command(create)
+  // .command(download)
+  // .command(publish)
+  // .command(search)
   .demandCommand(1)
   .help()
   .wrap(null)
