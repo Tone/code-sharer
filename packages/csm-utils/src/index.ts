@@ -1,12 +1,12 @@
 import path from 'path'
 import fs from 'fs-extra'
 import os from 'os'
-import { v4 as uuid } from 'uuid'
 import glob from 'glob'
 
-const TMP_DIR = os.tmpdir()
+export { default as download } from './download'
 
-export const DEFAULT_TEMPLATE_URL = 'https://github.com/Tone/code-sharer/tree/simple/packages/csm-template-vue'
+export const DEFAULT_TEMPLATE_URL =
+  'https://github.com/Tone/code-sharer/tree/simple/packages/csm-template-vue'
 
 export const DEFAULT_CONFIG_FILE = 'package.json'
 
@@ -20,17 +20,11 @@ export function parseConfig(dir = process.cwd()) {
   return fs.readJSONSync(configFile)[CONFIG_FILED] ?? null
 }
 
-export function download(url: string) {
-  const tmpDir = path.join(TMP_DIR, `csm-${uuid()}`)
-  fs.ensureDirSync(tmpDir)
-  return tmpDir
-}
-
 export const CONF_FILE = path.resolve(os.homedir(), '.csm.conf')
 
 interface Iconfig {
-  storage: string[],
-  template: Array<{ name: string, dir: string }>,
+  storage: string[]
+  template: Array<{ name: string; dir: string }>
   [key: string]: any
 }
 
@@ -71,6 +65,7 @@ class Config {
 export const config = new Config()
 
 export function files(patterns: string[]) {
-  const globPatterns = patterns.length > 1 ? '{' + patterns.join(',') + '}' : patterns[0]
+  const globPatterns =
+    patterns.length > 1 ? '{' + patterns.join(',') + '}' : patterns[0]
   return glob.sync(globPatterns)
 }

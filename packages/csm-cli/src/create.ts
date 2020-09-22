@@ -48,7 +48,7 @@ export async function handler(args: Arguments) {
   const { name, template } = await prompts(questions)
 
   try {
-    const templateExecFile = path.join(download(templateUrl), template)
+    const templateExecFile = path.join(await download(templateUrl), template)
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const templateExec = require(templateExecFile)
     await material.create(templateExec, path.join(dir, template, name))

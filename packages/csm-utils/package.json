@@ -17,9 +17,12 @@
   "dependencies": {
     "fs-extra": "^9.0.0",
     "glob": "^7.1.6",
+    "simple-git": "^2.5.0",
+    "tar": "^6.0.5",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
-    "@types/fs-extra": "^8.1.0"
+    "@types/fs-extra": "^8.1.0",
+    "@types/tar": "^4.0.3"
   }
 }
