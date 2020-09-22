@@ -3,7 +3,7 @@ import path from 'path'
 import prompts, { PromptObject } from 'prompts'
 
 import Material from '@tone./csm-core'
-import { parseConfig, download } from '@tone./csm-utils'
+import { download } from '@tone./csm-utils'
 
 import Err from './err'
 
@@ -19,11 +19,12 @@ function templates(categories: string[]) {
 
 export async function handler(args: Arguments) {
   const dir = process.cwd()
-  const config = parseConfig(dir)
+  const material = await Material.init(dir)
+  const config = material.config(dir)
+
   if (config === null) throw new Err(`${dir} is not a storage`)
 
-  const { version, categories, templateUrl } = config
-  const material = await Material.init(dir, version)
+  const { categories, templateUrl } = config
 
   const questions: PromptObject[] = [
     {

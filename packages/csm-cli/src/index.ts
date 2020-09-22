@@ -5,19 +5,21 @@ import * as yargs from 'yargs'
 
 import CliErr from './err'
 import init from './init'
-// import download from './pick'
-// import publish from './publish'
-// import search from './search'
-// import create from './create'
+import config from './config'
+import download from './download'
+import publish from './publish'
+import search from './search'
+import create from './create'
 
 console.log(chalk.yellow(figlet.textSync('CSM', { horizontalLayout: 'full' })))
 
 const argv = yargs
   .command(init)
-  // .command(create)
-  // .command(download)
-  // .command(publish)
-  // .command(search)
+  .command(config)
+  .command(create)
+  .command(download)
+  .command(publish)
+  .command(search)
   .demandCommand(1)
   .help()
   .wrap(null)

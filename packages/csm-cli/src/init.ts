@@ -2,24 +2,19 @@ import fs from 'fs-extra'
 import prompts, { PromptObject } from 'prompts'
 import path from 'path'
 import Err from './err'
+import { config, download } from '@tone./csm-utils'
 
 export const command = 'init'
 export const describe = 'Init material storage'
 
-const storageTemplate = [
-  {
-    title: 'vue',
-    value: '@tone./csm-template-vue'
-  }
-]
-
 function existsDir(dir: string) {
   const dirPath = path.join(process.cwd(), dir)
-
   return fs.existsSync(dirPath) ? `${dirPath} already exists` : true
 }
 
 export async function handler() {
+  const choices = (config.search('template') as Array<{ name: string, dir: string }>).map(t => ({ title: t.name, value: t.dir }))
+
   const questions: PromptObject[] = [
     {
       type: 'text',
@@ -31,7 +26,7 @@ export async function handler() {
       type: 'select',
       name: 'templateDir',
       message: 'Pick a template',
-      choices: storageTemplate,
+      choices,
       initial: 1
     }
   ]
@@ -39,8 +34,9 @@ export async function handler() {
   const { name, templateDir } = await prompts(questions)
 
   try {
+    const templateExecFile = download(templateDir)
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const template = require(templateDir)
+    const template = require(templateExecFile)
     const dir = path.join(process.cwd(), name)
     await template.init(dir)
   } catch (e) {

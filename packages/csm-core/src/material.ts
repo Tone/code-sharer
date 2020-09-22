@@ -4,47 +4,34 @@ import fs from 'fs-extra'
 import Storage from './storage'
 import Template from './template'
 import {
-  DEFAULT_MATERIAL_CONFIG_NAME,
-  SOURCE_DIR,
-  DEFAULT_BRANCH,
-  WIP_BRANCH
+  DEFAULT_CONFIG_FILE,
+  CONFIG_FILED,
+  SOURCE_DIR
 } from './constant'
-
-interface Dependencies {
-  name: string
-  version: string
-}
 
 interface MaterialInfo {
   name: string
+  category: string
   description: string
-  tags: string[]
+  keywords: string[]
   code?: string
-  dep: Dependencies[]
-}
-
-interface MaterialConfig {
-  stable: string
-  beta: string
+  dependencies: string[],
+  files: string[]
 }
 
 export default class Material {
   static async init(
-    dir: string,
-    url?: string,
-    config: MaterialConfig = { stable: DEFAULT_BRANCH, beta: WIP_BRANCH }
+    repo: string
   ) {
-    const storage = await Storage.init(dir, config.stable, url)
-    return new Material(storage, config)
+    const storage = await Storage.init(repo)
+    return new Material(storage)
   }
 
   private readonly storage: Storage
-  private readonly config: MaterialConfig
   log: Map<string, MaterialInfo>
 
-  constructor(storage: Storage, config: MaterialConfig) {
+  constructor(storage: Storage) {
     this.storage = storage
-    this.config = config
     this.log = this.count()
   }
 
@@ -53,36 +40,24 @@ export default class Material {
     return await template.init(dir)
   }
 
-  async checkExist(name: string, rest = true) {
+  async checkExist(name: string) {
     await this.storage.fetch()
-    await this.storage.branch(this.config.beta)
-    const exist = fs.existsSync(path.join(this.storage.dir, name))
-    if (rest) {
-      await this.storage.branch(this.config.stable)
-    }
-    return exist
+    return fs.existsSync(path.join(this.storage.dir, name))
   }
 
   async publish(files: string[], info: MaterialInfo) {
-    await this.storage.fetch()
-    await this.storage.branch(this.config.beta)
-
-    try {
-      if (await this.checkExist(info.name, false)) {
+    if (await this.checkExist(info.name)) {
         throw new Error(`${info.name} already exists
       `)
-      }
-      const commitHash = await this.storage.commit(files, `Add ${info.name}`)
-      await this.storage.push(commitHash, undefined, this.config.beta)
-    } finally {
-      await this.storage.branch(this.config.stable)
     }
+    const commitHash = await this.storage.commit(files, `Add ${info.name}`)
+    await this.storage.push(commitHash)
   }
 
   search(name: string, tag: string) {
     return Array.from(this.log.values()).filter(
       (info) =>
-        info.name.includes(name) && info.tags.some((t) => t.includes(tag))
+        info.name.includes(name) && info.keywords.some((t) => t.includes(tag))
     )
   }
 
@@ -104,8 +79,35 @@ export default class Material {
   }
 
   parse(dir: string): MaterialInfo {
-    const infoFile = path.join(dir, DEFAULT_MATERIAL_CONFIG_NAME)
-    return fs.readJSONSync(infoFile)
+    const info = fs.readJSONSync(path.join(dir, DEFAULT_CONFIG_FILE))
+    const { name, description, keywords, dependencies, files } = info
+
+    return {
+      name,
+      category: info[CONFIG_FILED]?.category,
+      description,
+      dependencies,
+      keywords,
+      code: info[CONFIG_FILED]?.code,
+      files
+    }
+  }
+
+  format(info: MaterialInfo) {
+    return `Material Info:
+    name: ${info.name}
+    category: ${info.category}
+    description: ${info.description}
+    keywords:${info.keywords.join(',')}
+    files:${info.files.join(',')}
+    code: ${info.code}
+    dependencies: ${info.dependencies.join(' ')}`
+  }
+
+  config(dir: string) {
+    const configFile = path.join(dir, DEFAULT_CONFIG_FILE)
+    if (!fs.existsSync(configFile)) return null
+    return fs.readJSONSync(configFile)[CONFIG_FILED] ?? null
   }
 
   async update() {

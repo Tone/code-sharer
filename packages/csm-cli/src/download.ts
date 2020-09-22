@@ -1,13 +1,13 @@
+import { Arguments } from 'yargs'
 import prompts, { PromptObject } from 'prompts'
-import chalk from 'chalk'
 
 import Material from '@tone./csm-core'
 import { config } from '@tone./csm-utils'
 
-export const command = 'search'
-export const describe = 'Search material'
+export const command = 'download'
+export const describe = 'Download material'
 
-export async function handler() {
+export async function handler(args: Arguments) {
   const storages = config.search('storage')
 
   const storageSelect: PromptObject = {
@@ -20,7 +20,7 @@ export async function handler() {
   const { storage } = await prompts(storageSelect)
   const materialCenter = await Material.init(storage)
 
-  const choices = Array.from(materialCenter.log.values()).map(m => ({ title: m.name, value: m, description: materialCenter.format(m) }))
+  const choices = Array.from(materialCenter.log.values()).map(m => ({ title: m.name, value: m }))
 
   const searchMaterial: PromptObject[] = [
     {
@@ -28,11 +28,16 @@ export async function handler() {
       name: 'material',
       message: 'Select material',
       choices
+    },
+    {
+      type: 'text',
+      name: 'dir',
+      message: 'Please input download location'
     }
   ]
 
-  const { material } = await prompts(searchMaterial)
-  console.log(chalk.green(materialCenter.format(material)))
+  const { material, dir } = await prompts(searchMaterial)
+  await materialCenter.download(material.name, dir)
 }
 
 export default {

@@ -1,4 +1,4 @@
-import { ERR_NAME } from './config'
+const ERR_NAME = 'CLI_ERR'
 
 export default class CliErr extends Error {
   message: string

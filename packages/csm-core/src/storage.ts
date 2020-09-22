@@ -1,11 +1,15 @@
 import Git, { SimpleGit } from 'simple-git/promise'
 import fs from 'fs-extra'
+import path from 'path'
+import crypto from 'crypto'
 
 import {
   DEFAULT_REPOSITORY_PATH,
   REMOTE_NAME,
   DEFAULT_BRANCH
 } from './constant'
+
+const HASH = crypto.createHash('sha256')
 
 export default class Storage {
   static async clone(url: string, dir = DEFAULT_REPOSITORY_PATH) {
@@ -14,32 +18,24 @@ export default class Storage {
     return new Storage(repository, dir)
   }
 
-  static async init(
-    dir = DEFAULT_REPOSITORY_PATH,
-    branch = DEFAULT_BRANCH,
-    url?: string
-  ) {
-    await fs.ensureDir(dir)
-    const repository = Git(dir)
-    const isRepo = await repository.checkIsRepo()
-    let storage
+  static async init(repo: string) {
+    if (path.isAbsolute(repo)) {
+      const repository = Git(repo)
+      const isRepo = await repository.checkIsRepo()
+      if (!isRepo) throw new Error(`${repo} is not a git repo`)
+      return new Storage(repository, repo)
+    }
 
-    if (isRepo) {
-      storage = new Storage(repository, dir)
-      await storage.branch(branch)
+    const dir = path.join(DEFAULT_REPOSITORY_PATH, HASH.copy().update(repo).digest('hex'))
+
+    if (fs.existsSync(dir)) {
+      const repository = Git(repo)
+      const storage = new Storage(repository, repo)
       await storage.pull()
-      return storage
-    } else if (url !== undefined) {
-      storage = await Storage.clone(url, dir)
-      await storage.branch(branch)
       return storage
     }
 
-    await repository.init()
-    storage = new Storage(repository, dir)
-    await storage.branch(branch)
-    await storage.pull()
-    return storage
+    return await Storage.clone(repo, dir)
   }
 
   private readonly repository: SimpleGit
