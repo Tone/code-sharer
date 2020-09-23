@@ -12,9 +12,16 @@ function isGit(url: string) {
   return url.includes('.git')
 }
 
+function execEnv(dir: string) {
+  execSync('yarn', { cwd: dir })
+
+  const exec = fs.readJSONSync(path.join(dir, 'package.json'))?.main
+  return exec !== undefined ? path.resolve(dir, exec) : dir
+}
+
 // repo.git#branch/path
 function parseGit(url: string) {
-  const matchArr = url.match(/(.+\.git)(#.+){0,1}(\/.+)/)
+  const matchArr = url.match(/(.+\.git)#(.+?(?=\/))?(\/.+)/)
 
   if (matchArr === null) return
   const [raw, repo, branch, dir] = matchArr
@@ -29,6 +36,7 @@ function parseGit(url: string) {
 async function downloadGit(url: string, dest: string) {
   const gitInfo = parseGit(url)
   if (gitInfo === undefined) throw new Error('parse git repo error')
+
   const { repo, branch, dir } = gitInfo
 
   await Git(dest).clone(repo, dest, [
@@ -40,9 +48,7 @@ async function downloadGit(url: string, dest: string) {
   ])
 
   const execPath = path.join(dest, dir)
-
-  execSync('npm install', { cwd: execPath })
-  return execPath
+  return execEnv(execPath)
 }
 
 async function downloadNpm(name: string, dest: string) {
@@ -53,16 +59,17 @@ async function downloadNpm(name: string, dest: string) {
   })
 
   const execPath = path.join(dest, 'package')
-  execSync(`npm install ${name}`, { cwd: execPath })
-
-  return execPath
+  return execEnv(execPath)
 }
 
 export default async function download(url: string) {
   const tmpDir = path.join(TMP_DIR, `csm-${uuid()}`)
   fs.ensureDirSync(tmpDir)
-
-  if (isGit(url)) return await downloadGit(url, tmpDir)
-
-  return await downloadNpm(url, tmpDir)
+  try {
+    if (isGit(url)) return await downloadGit(url, tmpDir)
+    return await downloadNpm(url, tmpDir)
+  } catch (e) {
+    fs.removeSync(tmpDir)
+    throw e
+  }
 }
