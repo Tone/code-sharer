@@ -6,7 +6,7 @@ import glob from 'glob'
 export { default as download } from './download'
 
 export const DEFAULT_TEMPLATE_URL =
-  'https://github.com/Tone/code-sharer/tree/simple/packages/csm-template-vue'
+  'git@github.com:Tone/code-sharer.git#simple/packages/csm-template-vue'
 
 export const DEFAULT_CONFIG_FILE = 'package.json'
 

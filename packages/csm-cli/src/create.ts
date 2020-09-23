@@ -10,10 +10,19 @@ import Err from './err'
 export const command = 'create [name]'
 export const describe = 'create material'
 
-function templates(categories: string[]) {
-  return categories.map((template) => ({
+enum templateType {
+  LOCAL,
+  REMOTE
+}
+
+function templates(categories: { [key: string]: string }) {
+  return Object.keys(categories).map(template => ({
     title: template,
-    value: template
+    value: {
+      name: template,
+      val: categories[template],
+      type: /^\./.test(categories[template]) ? templateType.LOCAL : templateType.REMOTE
+    }
   }))
 }
 
@@ -25,33 +34,43 @@ export async function handler(args: Arguments) {
   if (config === null) throw new Err(`${dir} is not a storage`)
 
   const { categories, templateUrl } = config
+  const categoryChoices = templates(categories)
+  const hasCategory = categoryChoices.length > 1
 
   const questions: PromptObject[] = [
     {
       type: 'text',
       name: 'name',
       message: 'Please input material name',
-      validate: async (val) => {
-        const exist: boolean = await material.checkExist(val)
+      validate: async (val, prev) => {
+        let dir = val
+        if (prev.template !== undefined) {
+          dir = `${prev.template.name}/${val}`
+        }
+        const exist: boolean = await material.checkExist(dir)
         return exist ? `${val} already exists` : true
       }
-    },
-    {
-      type: 'select',
-      name: 'template',
-      message: 'Pick a material category',
-      choices: templates(categories),
-      initial: 1
     }
   ]
 
-  const { name, template } = await prompts(questions)
+  if (hasCategory) {
+    questions.unshift(
+      {
+        type: 'select',
+        name: 'template',
+        message: 'Pick a material category',
+        choices: categoryChoices,
+        initial: 1
+      })
+  }
+
+  const { name, template = categoryChoices[0] } = await prompts(questions)
 
   try {
-    const templateExecFile = path.join(await download(templateUrl), template)
+    const templateExecFile = template.type === templateType.LOCAL ? path.join(await download(templateUrl), template.val) : await download(template.val)
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const templateExec = require(templateExecFile)
-    await material.create(templateExec, path.join(dir, template, name))
+    await material.create(templateExec, path.join(dir, hasCategory ? template.name : '', name))
   } catch (e) {
     throw new Err(`create ${name} fail`)
   }
