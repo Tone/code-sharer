@@ -13,7 +13,9 @@ function isGit(url: string) {
 }
 
 function execEnv(dir: string) {
-  execSync('yarn', { cwd: dir })
+  const pnpm = path.join(__dirname, '../node_modules/.bin/pnpm')
+
+  execSync(`node ${pnpm} i`, { cwd: dir })
 
   const exec = fs.readJSONSync(path.join(dir, 'package.json'))?.main
   return exec !== undefined ? path.resolve(dir, exec) : dir
