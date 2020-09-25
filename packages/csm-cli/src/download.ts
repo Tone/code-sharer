@@ -37,7 +37,7 @@ export async function handler(args: Arguments) {
   ]
 
   const { material, dir } = await prompts(searchMaterial)
-  await materialCenter.download(material.name, dir)
+  await materialCenter.download(material, dir)
 }
 
 export default {

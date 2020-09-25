@@ -15,7 +15,7 @@ enum templateType {
   REMOTE
 }
 
-function templates(categories: { [key: string]: string }) {
+function templates(categories: Record<string, string>) {
   return Object.keys(categories).map(template => ({
     title: template,
     value: {
@@ -30,8 +30,6 @@ export async function handler(args: Arguments) {
   const dir = process.cwd()
   const material = await Material.init(dir)
   const config = material.config(dir)
-
-  if (config === null) throw new Err(`${dir} is not a storage`)
 
   const { categories, templateUrl } = config
   const categoryChoices = templates(categories)
@@ -70,7 +68,7 @@ export async function handler(args: Arguments) {
     const templateExecFile = template.type === templateType.LOCAL ? path.join(await download(templateUrl), template.val) : await download(template.val)
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const templateExec = require(templateExecFile)
-    await material.create(templateExec, path.join(dir, hasCategory ? template.name : '', name))
+    await material.create(templateExec, path.join(dir, template.name, name))
   } catch (e) {
     throw new Err(`create ${name} fail`)
   }

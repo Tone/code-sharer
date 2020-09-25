@@ -1,7 +1,6 @@
 import Material from '@tone./csm-core'
 import prompts from 'prompts'
 import chalk from 'chalk'
-import { files } from '@tone./csm-utils'
 
 import Err from './err'
 
@@ -23,7 +22,7 @@ export async function handler() {
       initial: true
     }))
     if (value === true) {
-      await materialCenter.publish(files(materialInfo.files), materialInfo)
+      await materialCenter.publish(materialInfo)
     }
   } catch (e) {
     if (e.message !== undefined) throw new Err(e.message)

@@ -10,8 +10,6 @@ export const REMOTE_NAME = 'origin'
 
 export const DEFAULT_BRANCH = 'master'
 
-export const SOURCE_DIR = 'src'
-
 export const DEFAULT_CONFIG_FILE = 'package.json'
 
 export const CONFIG_FILED = 'csmConfig'
