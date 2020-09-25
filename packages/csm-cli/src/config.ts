@@ -3,7 +3,7 @@ import { Arguments, Argv } from 'yargs'
 
 import { config } from '@tone./csm-utils'
 
-export const command = 'config <handle> [key] [val]'
+export const command = 'config <handle> [key] [value]'
 export const describe = 'config storage'
 
 export function builder(argv: Argv) {
@@ -17,7 +17,7 @@ export function builder(argv: Argv) {
     type: 'string'
   })
 
-  argv.positional('val', {
+  argv.positional('value', {
     describe: 'value',
     type: 'string'
   })
@@ -26,21 +26,26 @@ export function builder(argv: Argv) {
 }
 
 export async function handler(args: Arguments) {
-  const handleType = ['add', 'remove']
+  const handleType = ['add', 'remove', 'list']
   const keys = ['storage', 'template']
 
   const { handle, key, value } = args as { [key: string]: string }
 
-  if (!handleType.includes(handle)) throw new Err('only support add, remove')
+  if (!handleType.includes(handle)) throw new Err('only support add, remove, list')
   if (!keys.includes(key)) throw new Err(`key is must one of ${keys.join(',')}`)
 
+  let echo
   switch (handle) {
     case 'add':
-      config.add(key, value)
+      echo = config.add(key, value)
       break
     case 'remove':
-      config.remove(key, value)
+      echo = config.remove(key, value)
+      break
+    case 'list':
+      echo = config.search(key)
   }
+  console.log(JSON.stringify(echo))
 }
 
 export default {

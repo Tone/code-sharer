@@ -3,11 +3,14 @@ import fs from 'fs-extra'
 import { files } from '@tone./csm-utils'
 
 import Storage from './storage'
-import Template from './template'
 import {
   DEFAULT_CONFIG_FILE,
   CONFIG_FILED
 } from './constant'
+
+interface Template {
+  init(dir: string): Promise<any>
+}
 
 interface MaterialInfo {
   name: string
@@ -46,7 +49,7 @@ export default class Material {
     this.log = this.count()
   }
 
-  async create(template: Template, dir: string) {
+  async create<T extends Template>(template: T, dir: string) {
     if (await this.checkExist(dir)) throw new Error(`${dir} already exists`)
     fs.ensureDirSync(dir)
     return await template.init(dir)

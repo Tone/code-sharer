@@ -14,12 +14,6 @@ export const CONFIG_FILED = 'csmConfig'
 
 export const DEFAULT_STORAGE_URL = 'git@github.com:Tone/csm-storage.git'
 
-export function parseConfig(dir = process.cwd()) {
-  const configFile = path.join(dir, DEFAULT_CONFIG_FILE)
-  if (!fs.existsSync(configFile)) return null
-  return fs.readJSONSync(configFile)[CONFIG_FILED] ?? null
-}
-
 export const CONF_FILE = path.resolve(os.homedir(), '.csm.conf')
 
 interface Iconfig {
@@ -45,12 +39,14 @@ class Config {
   add(key: string, val: string) {
     this.config[key].push(val)
     this.write()
+    return this.config[key]
   }
 
   remove(key: string, val: string) {
     const index = this.config[key].indexOf(val)
     if (index !== -1) this.config[key].splice(index, 1)
     this.write()
+    return this.config[key]
   }
 
   search(key: string) {
@@ -58,7 +54,7 @@ class Config {
   }
 
   write() {
-    fs.outputFileSync(this.file, this.config)
+    fs.outputJSONSync(this.file, this.config)
   }
 }
 

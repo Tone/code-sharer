@@ -24,24 +24,7 @@ describe('storage init should be right', () => {
     expect(fs.existsSync(testDir)).toBe(true)
     clear()
   })
-  test('find storage should be right', async () => {
-    const storage = await Storage.discover(testDir)
-    expect(storage).toBeInstanceOf(Storage)
-    expect(fs.existsSync(testDir)).toBe(true)
-    clear()
-  })
   test('init storage should be right', async () => {
-    expect(Storage.storage).toThrow(
-      /Storage does not init, please run init first/
-    )
-    const storage = await Storage.init(testDir)
-    expect(storage).toBeInstanceOf(Storage)
-    expect(fs.existsSync(testDir)).toBe(true)
-    expect(Storage.storage).not.toBeNull()
-    clear()
-  })
-
-  test('check should be right', async () => {
     jest.resetModules()
     const checkIsRepo = jest
       .fn()
@@ -56,10 +39,10 @@ describe('storage init should be right', () => {
     })
     const { default: Storage } = await import('../src/storage')
 
-    await expect(Storage.check(testDir)).rejects.toThrow(/does not exist/)
+    await expect(Storage.init(testDir)).rejects.toThrow(/is not a git repo/)
     fs.mkdirSync(testDir)
-    await expect(Storage.check(testDir)).rejects.toThrow(/does not init/)
-    await expect(Storage.check(testDir)).resolves.toBeUndefined()
+    await expect(Storage.init(testDir)).rejects.toThrow(/does not init/)
+    await expect(Storage.init(testDir)).resolves.toBeUndefined()
     expect(checkIsRepo).toBeCalledTimes(2)
     clear()
   })

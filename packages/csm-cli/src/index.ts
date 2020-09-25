@@ -3,7 +3,6 @@ import chalk from 'chalk'
 import figlet from 'figlet'
 import * as yargs from 'yargs'
 
-import CliErr from './err'
 import init from './init'
 import config from './config'
 import download from './download'
@@ -23,13 +22,9 @@ const argv = yargs
   .demandCommand(1)
   .help()
   .wrap(null)
-  .fail((msg, err: Error | CliErr, yargs) => {
-    if (err instanceof CliErr) {
-      console.log(chalk.bgRedBright(err.message))
-      return
-    }
+  .fail((msg, err: Error, yargs) => {
     console.error('You broke it!')
-    console.error(msg ?? err)
+    console.error(chalk.bgRedBright(msg ?? err))
     console.error('You should be doing', yargs.help())
     process.exit(1)
   }).argv

@@ -13,10 +13,7 @@ function existsDir(dir: string) {
 }
 
 export async function handler() {
-  const choices = (config.search('template') as Array<{
-    name: string
-    dir: string
-  }>).map((t) => ({ title: t.name, value: t.dir }))
+  const choices = config.search('template').map((t: string) => ({ title: t, value: t }))
 
   const questions: PromptObject[] = [
     {
@@ -29,17 +26,16 @@ export async function handler() {
       type: 'select',
       name: 'templateDir',
       message: 'Pick a template',
-      choices,
-      initial: 1
+      choices
     }
   ]
 
   const { name, templateDir } = await prompts(questions)
-
+  console.log(templateDir)
   try {
     const templateExecFile = await download(templateDir)
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const template = require(templateExecFile)
+    const { default: template } = require(templateExecFile)
     const dir = path.join(process.cwd(), name)
     await template.init(dir)
   } catch (e) {

@@ -14,7 +14,6 @@ function isGit(url: string) {
 
 function execEnv(dir: string) {
   const pnpm = path.join(__dirname, '../node_modules/.bin/pnpm')
-
   execSync(`node ${pnpm} i`, { cwd: dir })
 
   const exec = fs.readJSONSync(path.join(dir, 'package.json'))?.main
@@ -54,10 +53,10 @@ async function downloadGit(url: string, dest: string) {
 }
 
 async function downloadNpm(name: string, dest: string) {
-  const packName = execSync(`npm pack ${name}`, { cwd: dest }).toString()
+  const packName = execSync(`npm pack ${name}`, { cwd: dest }).toString().replace(/\s/g, '')
   await tar.x({
     cwd: dest,
-    file: packName
+    file: path.join(dest, packName)
   })
 
   const execPath = path.join(dest, 'package')

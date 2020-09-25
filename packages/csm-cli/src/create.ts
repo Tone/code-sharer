@@ -65,10 +65,18 @@ export async function handler(args: Arguments) {
   const { name, template = categoryChoices[0] } = await prompts(questions)
 
   try {
-    const templateExecFile = template.type === templateType.LOCAL ? path.join(await download(templateUrl), template.val) : await download(template.val)
+    let templateExecFile
+
+    if (template.type === templateType.LOCAL) {
+      const execDir = await download(templateUrl)
+      templateExecFile = path.extname(execDir) !== '' ? path.resolve(path.dirname(execDir), template.val) : path.resolve(execDir, template.val)
+    } else {
+      templateExecFile = await download(template.val)
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const templateExec = require(templateExecFile)
-    await material.create(templateExec, path.join(dir, template.name, name))
+    await material.create(templateExec, path.resolve(dir, template.val, name))
   } catch (e) {
     throw new Err(`create ${name} fail`)
   }
