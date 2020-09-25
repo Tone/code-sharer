@@ -1,9 +1,8 @@
-import { Template } from '@tone./csm-core'
 import path from 'path'
 
 import { execSync } from 'child_process'
 
-class Generate extends Template {
+class Generate {
   async init(dir: string) {
     const name = path.basename(dir)
     const vueCli = path.resolve(__dirname, '../../node_modules/.bin/vue')

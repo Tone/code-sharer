@@ -4,7 +4,9 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "start": "ts-node __test__/index.ts"
+    "build": "tsc",
+    "postbuild": "copyfiles -u 1  'src/**/*' -e '**/*.ts' lib",
+    "prebuild": "rimraf lib tsconfig.tsbuildinfo"
   },
   "repository": {
     "type": "git",
@@ -15,16 +17,16 @@
     "access": "public"
   },
   "files": [
-    "/lib/**/*",
-    "template/**/*"
+    "lib/**/*"
   ],
   "dependencies": {
-    "@tone./csm-core": "^1.0.0-alpha.0",
     "@vue/cli": "^4.5.6",
     "ejs": "^3.1.5",
     "fs-extra": "^9.0.0"
   },
   "devDependencies": {
-    "@types/ejs": "^3.0.4"
+    "@types/ejs": "^3.0.4",
+    "copyfiles": "^2.3.0",
+    "rimraf": "^3.0.2"
   }
 }
