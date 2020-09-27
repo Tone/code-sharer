@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs-extra'
-import { files } from '@tone./csm-utils'
+import { copyByGlob } from '@tone./csm-utils'
 
 import Storage from './storage'
 import {
@@ -18,7 +18,7 @@ interface MaterialInfo {
   description: string
   keywords: string[]
   code?: string
-  dependencies: string[],
+  dependencies: Record<string, string>,
   files: string[]
 }
 
@@ -65,13 +65,10 @@ export default class Material {
   }
 
   async publish(info: MaterialInfo) {
-    if (await this.checkExist(path.join(info.category, info.name))) {
-        throw new Error(`${info.name} already exists
-      `)
+    const commitHash = await this.storage.commit(['.'], `Add ${info.category}/${info.name}`)
+    if (commitHash !== '') {
+      await this.storage.push(commitHash)
     }
-    const commitFiles = files([`${info.category}/${info.name}/**/*`])
-    const commitHash = await this.storage.commit(commitFiles, `Add ${info.name}`)
-    await this.storage.push(commitHash)
   }
 
   search(str: string, searchKey = SearchKey.ALL) {
@@ -92,8 +89,8 @@ export default class Material {
   async download(info: MaterialInfo, target: string) {
     const srcDir = path.join(this.storage.dir, info.category, info.name)
     const targetDir = path.join(target, info.name)
-    const source = files(info.files).map(async file => await fs.copy(path.join(srcDir, file), targetDir))
-    return await Promise.all(source)
+
+    return copyByGlob(info.files, targetDir, { cwd: srcDir })
   }
 
   dirs() {
@@ -124,7 +121,7 @@ export default class Material {
   parse(dir: string): MaterialInfo | null {
     if (!fs.existsSync(path.join(dir, DEFAULT_CONFIG_FILE))) return null
     const info = fs.readJSONSync(path.join(dir, DEFAULT_CONFIG_FILE))
-    const { name, description, keywords, dependencies, files } = info
+    const { name, description, keywords = [], dependencies = {}, files = [] } = info
 
     return {
       name,
@@ -132,7 +129,7 @@ export default class Material {
       description,
       dependencies,
       keywords,
-      code: info[CONFIG_FILED]?.code,
+      code: info[CONFIG_FILED]?.code ?? '',
       files
     }
   }
@@ -145,7 +142,7 @@ export default class Material {
     keywords:${info.keywords.join(',')}
     files:${info.files.join(',')}
     code: ${info.code}
-    dependencies: ${info.dependencies.join(' ')}`
+    dependencies: ${Object.keys(info.dependencies).map(dep => `${dep}@${info.dependencies[dep]}`).join(' ')}`
   }
 
   config(dir: string): MaterialConfig {

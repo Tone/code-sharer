@@ -13,9 +13,11 @@ const HASH = crypto.createHash('sha256')
 
 export default class Storage {
   static async clone(url: string, dir = DEFAULT_REPOSITORY_PATH) {
+    fs.emptyDirSync(dir)
     const repository = Git(dir)
     await repository.clone(url, dir, ['--depth', '1'])
-    return new Storage(repository, dir)
+    const root = await repository.revparse(['--show-toplevel'])
+    return new Storage(repository, root)
   }
 
   static async init(repo: string) {
@@ -23,14 +25,17 @@ export default class Storage {
       const repository = Git(repo)
       const isRepo = await repository.checkIsRepo()
       if (!isRepo) throw new Error(`${repo} is not a git repo`)
-      return new Storage(repository, repo)
+      const root = await repository.revparse(['--show-toplevel'])
+
+      return new Storage(repository, root)
     }
 
     const dir = path.join(DEFAULT_REPOSITORY_PATH, HASH.copy().update(repo).digest('hex'))
 
     if (fs.existsSync(dir)) {
-      const repository = Git(repo)
-      const storage = new Storage(repository, repo)
+      const repository = Git(dir)
+      const root = await repository.revparse(['--show-toplevel'])
+      const storage = new Storage(repository, root)
       await storage.pull()
       return storage
     }
@@ -48,7 +53,7 @@ export default class Storage {
 
   async commit(files: string[], message: string) {
     await this.repository.add(files)
-    const commitInfo = await this.repository.commit(message, files)
+    const commitInfo = await this.repository.commit(message)
     if (commitInfo === null) {
       throw new Error('commit error, please check if git config is correct')
     }

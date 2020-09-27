@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs-extra'
 import os from 'os'
-import glob from 'glob'
+import fg from 'fast-glob'
 
 export { default as download } from './download'
 
@@ -60,8 +60,22 @@ class Config {
 
 export const config = new Config()
 
-export function files(patterns: string[]) {
-  const globPatterns =
-    patterns.length > 1 ? '{' + patterns.join(',') + '}' : patterns[0]
-  return glob.sync(globPatterns)
+export async function filesByGlob(patterns: string[], cwd = process.cwd()) {
+  return await fg(patterns, { cwd })
+}
+
+export async function copyByGlob(patterns: string[], dest: string, { cwd = process.cwd() }) {
+  const files = await filesByGlob(patterns, cwd)
+
+  return files.reduce((source: string[], file) => {
+    const srcFile = path.join(cwd, file)
+    const destFile = path.join(dest, file)
+
+    if (fs.statSync(srcFile).isFile()) {
+      fs.copySync(srcFile, destFile)
+      source.push(destFile)
+    }
+
+    return source
+  }, [])
 }
