@@ -40,21 +40,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var path_1 = __importDefault(require("path"));
-var child_process_1 = require("child_process");
+var execa_1 = __importDefault(require("execa"));
+var fs_extra_1 = __importDefault(require("fs-extra"));
 var Generate = /** @class */ (function () {
     function Generate() {
     }
     Generate.prototype.init = function (dir) {
         return __awaiter(this, void 0, void 0, function () {
-            var name, vueCli, preset;
+            var name, cwd, vueCli, preset;
             return __generator(this, function (_a) {
-                name = path_1.default.basename(dir);
-                vueCli = path_1.default.resolve(__dirname, '../../node_modules/.bin/vue');
-                preset = path_1.default.resolve(__dirname, './preset');
-                child_process_1.execSync("node " + vueCli + " create " + name + " --preset " + preset, {
-                    cwd: path_1.default.dirname(dir)
-                });
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0:
+                        name = path_1.default.basename(dir);
+                        cwd = path_1.default.dirname(dir);
+                        return [4 /*yield*/, fs_extra_1.default.ensureDir(cwd)];
+                    case 1:
+                        _a.sent();
+                        vueCli = path_1.default.resolve(__dirname, '../../node_modules/.bin/vue');
+                        preset = path_1.default.resolve(__dirname, './preset');
+                        return [4 /*yield*/, execa_1.default('node', [vueCli, 'create', name, '--preset', preset], {
+                                cwd: cwd
+                            })];
+                    case 2: return [2 /*return*/, _a.sent()];
+                }
             });
         });
     };

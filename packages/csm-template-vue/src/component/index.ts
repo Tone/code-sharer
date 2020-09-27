@@ -1,15 +1,16 @@
 import path from 'path'
-
-import { execSync } from 'child_process'
+import execa from 'execa'
+import fs from 'fs-extra'
 
 class Generate {
   async init(dir: string) {
     const name = path.basename(dir)
+    const cwd = path.dirname(dir)
+    await fs.ensureDir(cwd)
     const vueCli = path.resolve(__dirname, '../../node_modules/.bin/vue')
     const preset = path.resolve(__dirname, './preset')
-
-    execSync(`node ${vueCli} create ${name} --preset ${preset}`, {
-      cwd: path.dirname(dir)
+    return await execa('node', [vueCli, 'create', name, '--preset', preset], {
+      cwd
     })
   }
 }
