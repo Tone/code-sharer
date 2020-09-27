@@ -1,7 +1,8 @@
 import fs from 'fs-extra'
 import prompts, { PromptObject } from 'prompts'
 import path from 'path'
-import Err from './err'
+import ora from 'ora'
+
 import { config, download } from '@tone./csm-utils'
 
 export const command = 'init'
@@ -20,26 +21,34 @@ export async function handler() {
       type: 'text',
       name: 'name',
       message: 'Please input material storage name',
-      validate: (val) => existsDir(val)
+      validate: (val) => val === '' ? true : existsDir(val)
     },
     {
-      type: 'select',
+      type: prev => prev === '' ? 'confirm' : null,
+      name: 'curDir',
+      message: 'remove all files in current dir ?'
+    },
+    {
+      type: prev => prev !== false ? 'select' : null,
       name: 'templateDir',
       message: 'Pick a template',
       choices
     }
   ]
 
-  const { name, templateDir } = await prompts(questions)
-  console.log(templateDir)
+  const { name, templateDir, curDir } = await prompts(questions)
+  if (curDir === false) return
+  const spinner = ora('downloading template').start()
+
   try {
     const templateExecFile = await download(templateDir)
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { default: template } = require(templateExecFile)
     const dir = path.join(process.cwd(), name)
+    spinner.text = 'init template...'
     await template.init(dir)
-  } catch (e) {
-    throw new Err('Init Err')
+  } finally {
+    spinner.stop()
   }
 }
 

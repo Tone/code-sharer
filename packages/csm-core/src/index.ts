@@ -1,10 +1,8 @@
 
 import Material from './material'
-import Template from './template'
 
 export {
-  Material,
-  Template
+  Material
 }
 
 export default Material

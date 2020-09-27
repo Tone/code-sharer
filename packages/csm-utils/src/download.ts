@@ -3,7 +3,7 @@ import fs from 'fs-extra'
 import { v4 as uuid } from 'uuid'
 import path from 'path'
 import Git from 'simple-git/promise'
-import { execSync } from 'child_process'
+import execa from 'execa'
 import tar from 'tar'
 
 const TMP_DIR = os.tmpdir()
@@ -13,9 +13,8 @@ function isGit(url: string) {
 }
 
 function execEnv(dir: string) {
-  const pnpm = path.join(__dirname, '../node_modules/.bin/pnpm')
-  execSync(`node ${pnpm} i`, { cwd: dir })
-
+  // const pnpm = path.join(__dirname, '../node_modules/.bin/pnpm')
+  execa.sync('npm', ['i'], { cwd: dir })
   const exec = fs.readJSONSync(path.join(dir, 'package.json'))?.main
   return exec !== undefined ? path.resolve(dir, exec) : dir
 }
@@ -53,7 +52,7 @@ async function downloadGit(url: string, dest: string) {
 }
 
 async function downloadNpm(name: string, dest: string) {
-  const packName = execSync(`npm pack ${name}`, { cwd: dest }).toString().replace(/\s/g, '')
+  const { stdout: packName } = execa.sync('npm', ['pack', name], { cwd: dest })
   await tar.x({
     cwd: dest,
     file: path.join(dest, packName)

@@ -51,8 +51,12 @@ export default class Material {
 
   async create<T extends Template>(template: T, dir: string) {
     if (await this.checkExist(dir)) throw new Error(`${dir} already exists`)
-    fs.ensureDirSync(dir)
-    return await template.init(dir)
+    try {
+      return await template.init(dir)
+    } catch (e) {
+      fs.removeSync(dir)
+      throw e
+    }
   }
 
   async checkExist(dir: string) {
@@ -98,7 +102,9 @@ export default class Material {
     if (config?.categories === undefined) throw new Error('storage config parse error, not find categories')
 
     return Object.keys(config.categories).reduce((dirs: string[], dir) => {
-      const subDir = fs.readdirSync(path.join(storageDir, dir)).map(sub => path.join(dir, sub))
+      const categoryDir = path.join(storageDir, dir)
+      if (!fs.existsSync(categoryDir)) return dirs
+      const subDir = fs.readdirSync(categoryDir).map(sub => path.join(dir, sub))
       return [...dirs, ...subDir]
     }, [])
   }
@@ -108,12 +114,15 @@ export default class Material {
     const log: Map<string, MaterialInfo> = new Map()
 
     return dirs.reduce((log, dir) => {
-      log.set(dir, this.parse(path.join(this.storage.dir, dir)))
+      const info = this.parse(path.join(this.storage.dir, dir))
+      if (info === null) return log
+      log.set(dir, info)
       return log
     }, log)
   }
 
-  parse(dir: string): MaterialInfo {
+  parse(dir: string): MaterialInfo | null {
+    if (!fs.existsSync(path.join(dir, DEFAULT_CONFIG_FILE))) return null
     const info = fs.readJSONSync(path.join(dir, DEFAULT_CONFIG_FILE))
     const { name, description, keywords, dependencies, files } = info
 

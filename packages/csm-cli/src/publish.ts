@@ -13,6 +13,7 @@ export async function handler() {
   try {
     const materialInfo = materialCenter.parse(dir)
 
+    if (materialInfo === null) throw new Err(`No package.json found in ${dir}`)
     console.log(chalk.green(materialCenter.format(materialInfo)))
 
     const { value } = (await prompts({

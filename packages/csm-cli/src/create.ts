@@ -1,13 +1,12 @@
 import { Arguments } from 'yargs'
 import path from 'path'
 import prompts, { PromptObject } from 'prompts'
+import ora from 'ora'
 
 import Material from '@tone./csm-core'
 import { download } from '@tone./csm-utils'
 
-import Err from './err'
-
-export const command = 'create [name]'
+export const command = 'create'
 export const describe = 'create material'
 
 enum templateType {
@@ -33,16 +32,22 @@ export async function handler(args: Arguments) {
 
   const { categories, templateUrl } = config
   const categoryChoices = templates(categories)
-  const hasCategory = categoryChoices.length > 1
 
   const questions: PromptObject[] = [
+    {
+      type: () => categoryChoices.length > 1 ? 'select' : null,
+      name: 'template',
+      message: 'Pick a material category',
+      choices: categoryChoices,
+      initial: 1
+    },
     {
       type: 'text',
       name: 'name',
       message: 'Please input material name',
       validate: async (val, prev) => {
         let dir = val
-        if (prev.template !== undefined) {
+        if (prev?.template !== undefined) {
           dir = `${prev.template.name}/${val}`
         }
         const exist: boolean = await material.checkExist(dir)
@@ -51,18 +56,8 @@ export async function handler(args: Arguments) {
     }
   ]
 
-  if (hasCategory) {
-    questions.unshift(
-      {
-        type: 'select',
-        name: 'template',
-        message: 'Pick a material category',
-        choices: categoryChoices,
-        initial: 1
-      })
-  }
-
-  const { name, template = categoryChoices[0] } = await prompts(questions)
+  const { name, template = categoryChoices[0].value } = await prompts(questions)
+  const spinner = ora('downloading template').start()
 
   try {
     let templateExecFile
@@ -74,11 +69,13 @@ export async function handler(args: Arguments) {
       templateExecFile = await download(template.val)
     }
 
+    spinner.text = 'create material'
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const templateExec = require(templateExecFile)
-    await material.create(templateExec, path.resolve(dir, template.val, name))
-  } catch (e) {
-    throw new Err(`create ${name} fail`)
+    const { default: templateExec } = require(templateExecFile)
+    const out = await material.create(templateExec, path.resolve(dir, template.name, name))
+    console.log(typeof out === 'string' ? out : out?.stdout)
+  } finally {
+    spinner.stop()
   }
 }
 
