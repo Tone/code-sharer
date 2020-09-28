@@ -121,7 +121,7 @@ export default class Material {
   parse(dir: string): MaterialInfo | null {
     if (!fs.existsSync(path.join(dir, DEFAULT_CONFIG_FILE))) return null
     const info = fs.readJSONSync(path.join(dir, DEFAULT_CONFIG_FILE))
-    const { name, description, keywords = [], dependencies = {}, files = [] } = info
+    const { name, description = '', keywords = [], dependencies = {}, files = [] } = info
 
     return {
       name,

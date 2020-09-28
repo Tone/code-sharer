@@ -18,7 +18,7 @@ export const CONF_FILE = path.resolve(os.homedir(), '.csm.conf')
 
 interface Iconfig {
   storage: string[]
-  template: Array<{ name: string; dir: string }>
+  template: string[]
   [key: string]: any
 }
 

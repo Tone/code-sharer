@@ -1,0 +1,18 @@
+.img {
+  padding: 4px;
+  width: 100% !important;
+}
+.tags {
+  display: flex;
+  padding: 0 4px;
+  height: 2em;
+  overflow: hidden;
+}
+.tag{
+  color:rgba(0, 0, 0, 0.45);
+  margin: 0 2px;
+  line-height: 1;
+}
+.tag:hover{
+  color:rgba(0, 0, 0, 0.65);
+}

@@ -1,0 +1,19 @@
+.layout{
+  height: 100vh;
+}
+.head{
+  background: #fff;
+}
+.content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex:1;
+  overflow-y: scroll;
+}
+.pagination {
+  background: #fff;
+  padding: 8px;
+  display: flex;
+  justify-content: flex-end;
+}

@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import store from '../../service'
+import Store from '../../service'
+const { store } = Store
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const {

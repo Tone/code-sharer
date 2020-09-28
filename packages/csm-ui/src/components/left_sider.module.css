@@ -1,0 +1,12 @@
+.left_sider {
+
+}
+
+.name{
+  font-weight: 600;
+  font-size: 18px;
+  animation: fade-in;
+  animation-duration: .2s;
+  padding: 32px 16px 0;
+  color: #fff;
+}
