@@ -1,32 +1,33 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import store from '../../service'
 import { currentExecDir } from '../../service/config'
 import path from 'path'
 
+import Store from '../../service'
+const { store } = Store
+
 export default async (req: NextApiRequest, res: NextApiResponse) => {
+  if (store === null) {
+    res.status(500).send({ msg: 'store does not init' })
+    return
+  }
+
   const {
-    query: { r, c, n, d }
+    query: { c, n, d }
   } = req
   if (
-    r === '' || r === undefined ||
     c === '' || c === undefined ||
     n === '' || n === undefined ||
-    Array.isArray(r) ||
+    d === '' || d === undefined ||
     Array.isArray(c) ||
-    Array.isArray(n)
+    Array.isArray(n) ||
+    Array.isArray(d)
   ) {
     res.status(400).send(null)
     return
   }
 
   try {
-    const material = await store.findMaterial(r, c, n)
-
-    if (material === null) {
-      res.status(500).send({ msg: 'material does not exist' })
-      return
-    }
-    await material.pick(path.join(currentExecDir, d as string))
+    await store.download(n, c, path.join(currentExecDir, d))
     res.status(200).send({})
   } catch (e) {
     res.status(500).send(e)

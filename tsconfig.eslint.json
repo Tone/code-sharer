@@ -8,6 +8,7 @@
     "packages/csm-ui/src/components/**/*",
     "packages/csm-ui/src/service/**/*",
     "packages/csm-ui/src/mock/**/*",
+    "packages/csm-ui/src/api/**/*",
     "packages/csm-template-vue/src/**/*.ts"
   ],
   "exclude": [

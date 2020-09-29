@@ -90,7 +90,7 @@ export default class Material {
     const srcDir = path.join(this.storage.dir, info.category, info.name)
     const targetDir = path.join(target, info.name)
 
-    return copyByGlob(info.files, targetDir, { cwd: srcDir })
+    return await copyByGlob(info.files, targetDir, { cwd: srcDir })
   }
 
   dirs() {

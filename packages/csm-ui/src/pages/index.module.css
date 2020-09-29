@@ -3,6 +3,12 @@
 }
 .head{
   background: #fff;
+  display: flex;
+  align-items:center;
+  justify-content: flex-end;
+  box-shadow: 0 2px 8px #f0f1f2;
+  position: relative;
+  z-index: 1;
 }
 .content {
   padding: 16px;
@@ -16,4 +22,8 @@
   padding: 8px;
   display: flex;
   justify-content: flex-end;
+}
+
+.head :global .ant-input-search-icon{
+  display: none;
 }

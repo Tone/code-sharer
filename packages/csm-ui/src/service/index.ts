@@ -44,7 +44,7 @@ class Store {
     })
   }
 
-  async download(url: string) {
+  async download(name: string, category: string, dest: string) {
 
   }
 
