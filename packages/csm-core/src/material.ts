@@ -162,10 +162,14 @@ export default class Material {
   }
 
   updateLog(info: MaterialInfo) {
-    this.log.set(`${info.category}/${info.name}`, info)
+    this.log.set(path.join(info.category, info.name), info)
   }
 
   has(info: MaterialInfo) {
-    return this.log.has(`${info.category}/${info.name}`)
+    return this.log.has(path.join(info.category, name))
+  }
+
+  find(category: string, name: string) {
+    return this.log.get(path.join(category, name)) ?? null
   }
 }

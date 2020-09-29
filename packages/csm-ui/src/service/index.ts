@@ -1,12 +1,11 @@
-import path from 'path'
-
-import fs from 'fs-extra'
 import Material from '@tone./csm-core'
 import { config } from '@tone./csm-utils'
+import { MaterialInfo } from '../interface'
 
 class Store {
   static store: null | Store = null
   static async init() {
+    if (Store.store !== null) return Store.store
     const storages: Array<[string, Material]> = await Promise.all(config.search('storage').map(async (storage: string) => [storage, await Material.init(storage)]))
     Store.store = new Store(storages)
     return Store.store
@@ -35,33 +34,49 @@ class Store {
     return this.storages.get(url)
   }
 
-  get repos(): any {
-    return Array.from(this.storages.entries()).map(([url, storage]) => {
-      return {
-        url,
-        material: Array.from(storage.log.values())
-      }
-    })
+  get repos() {
+    return Array.from(this.storages.keys()).map(url => this.parseRepo(url))
   }
 
-  async download(name: string, category: string, dest: string) {
-
+  async download(url: string, category: string, name: string, dest: string) {
+    const [center, material] = this.findMaterial(url, category, name)
+    return await center.download(material, dest)
   }
 
   async refresh(url: string) {
-
+    const center = this.getCenter(url)
+    await center.update()
+    return this.parseRepo(url)
   }
 
-  async parseRepo(url: string) {
+  async refreshAll() {
+    await Promise.all(Array.from(this.storages.values()).map(async center => await center.update()))
+    return this.repos
+  }
 
+  parseRepo(url: string) {
+    const center = this.getCenter(url)
+    return {
+      url,
+      material: Array.from(center.log.values()).map(material => ({ ...material, url }))
+    }
   }
 
   async getMaterials(repo: string, category: string) {
 
   }
 
-  async findMaterial(repo: string, category: string, name: string) {
+  private getCenter(repo: string) {
+    const center = this.storages.get(repo)
+    if (center === undefined) throw new Error(`${repo} is not a storage`)
+    return center
+  }
 
+  private findMaterial(repo: string, category: string, name: string): [Material, MaterialInfo] {
+    const center = this.getCenter(repo)
+    const material = center.find(category, name)
+    if (material === null) throw new Error(`No ${category} ${name} found in ${repo} is not a storage`)
+    return [center, material]
   }
 }
 

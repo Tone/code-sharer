@@ -19,7 +19,8 @@ export const repos = mock([
         files: [
           'src/**/*',
           '!src/main.js'
-        ]
+        ],
+        url: 'git@github.com:Tone/csm-storage.git'
       }
     ]
   },

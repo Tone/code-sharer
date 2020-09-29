@@ -3,15 +3,15 @@ import { Card, Col, Row, Skeleton, Typography, Space, Modal, Descriptions, Butto
 import { DownloadOutlined, EllipsisOutlined, CopyOutlined } from '@ant-design/icons'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 
-import { MaterialInfo } from '../interface'
+import { Info } from '../interface'
 import styles from './content.module.css'
 import * as Api from '../api'
 
 const { Meta } = Card
 const { Paragraph, Title, Text } = Typography
 
-function MainContent({ materials, project }: { materials: MaterialInfo, project: string }) {
-  const [downloadMaterial, setDownload] = useState<null | MaterialInfo[0]>(null)
+function MainContent({ materials, project }: { materials: Info[], project: string }) {
+  const [downloadMaterial, setDownload] = useState<null | Info>(null)
   const [confirmLoading, setConfirmLoading] = useState(false)
   const inputRef = useRef<null | Input>(null)
 
@@ -21,14 +21,14 @@ function MainContent({ materials, project }: { materials: MaterialInfo, project:
     if (downloadMaterial === null || value === undefined) return
     setConfirmLoading(true)
     try {
-      const { name, category } = downloadMaterial
-      await Api.download(name, category, value)
+      await Api.download(downloadMaterial, value)
+      setDownload(null)
     } finally {
       setConfirmLoading(false)
     }
   }
 
-  const [copyMaterial, setCopy] = useState<null | MaterialInfo[0]>(null)
+  const [copyMaterial, setCopy] = useState<null | Info>(null)
 
   return (
     <div>
