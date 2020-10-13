@@ -4,13 +4,8 @@
 
 ### Storage 提供存储库基础操作
 
-- 数据获取
-- 数据提交
-- 数据统计
+- [API](./docs/index.html)
 
 ### Material 提供物料的基础操作
 
-- 创建
-- 发布
-- 查询
-- 下载
+- [API](./docs/index.html)
