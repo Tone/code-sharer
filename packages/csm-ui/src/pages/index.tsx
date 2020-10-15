@@ -1,4 +1,4 @@
-import { GetStaticProps } from 'next'
+import { GetServerSideProps } from 'next'
 import { Layout, Pagination, Input, Button, Space, Row, Col, Empty } from 'antd'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons'
@@ -127,7 +127,7 @@ function IndexPage({ repos, project }: IndexPageProps) {
 
 export default IndexPage
 
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const store = await Store.init()
   return {
     props: {

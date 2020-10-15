@@ -5,14 +5,13 @@ import fg from 'fast-glob'
 
 export { default as download } from './download'
 
-export const DEFAULT_TEMPLATE_URL =
-  'git@github.com:Tone/code-sharer.git#simple/packages/csm-template-vue'
+export const DEFAULT_TEMPLATE_URL = ''
 
 export const DEFAULT_CONFIG_FILE = 'package.json'
 
 export const CONFIG_FILED = 'csmConfig'
 
-export const DEFAULT_STORAGE_URL = 'git@github.com:Tone/csm-storage.git'
+export const DEFAULT_STORAGE_URL = ''
 
 export const CONF_FILE = path.resolve(os.homedir(), '.csm.conf')
 
