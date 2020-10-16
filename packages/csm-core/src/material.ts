@@ -152,10 +152,8 @@ export default class Material {
   }
 
   async update() {
-    const curHead = await this.storage.head()
-    const remoteHead = await (await this.storage.fetch()).head()
-
-    if (curHead !== remoteHead) {
+    const { behind } = await this.storage.status()
+    if (behind > 0) {
       await this.storage.pull()
       this.log = this.count()
     }

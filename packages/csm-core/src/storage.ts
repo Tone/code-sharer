@@ -112,8 +112,8 @@ export default class Storage {
     return ''
   }
 
-  async head() {
-    return (await this.repository.status()).current
+  async status() {
+    return await this.repository.status()
   }
 
   async branch(name: string, remote = REMOTE_NAME) {

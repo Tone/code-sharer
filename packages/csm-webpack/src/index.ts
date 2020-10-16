@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('safe-require')('html-webpack-plugin')
 
 // const HtmlWebpackPlugin = require('safe-require')(webpack-html3')
 
-const execPath = path.dirname(require.resolve('@tone./csm-ui'))
+const execPath = require.resolve('@tone./csm-ui')
 
 interface Options {
   port?: number,
@@ -99,8 +99,8 @@ export class CSMServiceWebpackPlugin {
   port: string
   exec: string
   store?: string
-  constructor(options: Options = { port: 3000, exec: execPath, store: '' }) {
-    this.port = options.port !== undefined ? `${options.port}` : '3000'
+  constructor(options: Options = { port: 3020, exec: execPath, store: '' }) {
+    this.port = options.port !== undefined ? `${options.port}` : '3020'
     this.exec = options.exec ?? execPath
     this.store = options.store
   }
@@ -112,8 +112,8 @@ export class CSMServiceWebpackPlugin {
         this.constructor.name,
         () => {
           if (compiler.options.mode === 'development') {
-            const service = spawn('npm', ['run', 'start'], {
-              cwd: this.exec,
+            const service = spawn('node', [this.exec], {
+              cwd: path.dirname(this.exec),
               env: { ...process.env, STORE_URL: this.store, PORT: this.port, NODE_ENV: 'production', PROJECT: process.cwd() }
             })
             service.stdout.on('data', data => console.log('[CSM_SERVICE]:', data.toString()))

@@ -18,9 +18,7 @@ const compiler = webpack({
   },
   plugins: [
     new HtmlWebpackPlugin(),
-    new CSMServiceWebpackPlugin({
-      exec: path.join(process.cwd(), '../../', 'node_modules', '@tone./csm-ui')
-    })
+    new CSMServiceWebpackPlugin()
   ]
 })
 
