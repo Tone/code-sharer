@@ -1,6 +1,6 @@
 {
   "name": "@tone./csm-ui",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "files": [
     ".next/**/*",
     "server.js"
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@tone./csm-core": "^1.0.0-beta.0",
-    "@tone./csm-utils": "^1.0.0-beta.0",
+    "@tone./csm-utils": "^1.0.0-beta.1",
     "antd": "^4.6.6",
     "fs-extra": "^9.0.1",
     "next": "9.5.3",
