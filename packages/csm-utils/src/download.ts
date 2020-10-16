@@ -12,9 +12,9 @@ function isGit(url: string) {
   return url.includes('.git')
 }
 
-function execEnv(dir: string) {
-  // const pnpm = path.join(__dirname, '../node_modules/.bin/pnpm')
-  execa.sync('npm', ['i'], { cwd: dir })
+async function execEnv(dir: string) {
+  const pnpm = require.resolve('pnpm')
+  await execa('node', [pnpm, 'i'], { cwd: dir })
   const exec = fs.readJSONSync(path.join(dir, 'package.json'))?.main
   return exec !== undefined ? path.resolve(dir, exec) : dir
 }
@@ -48,7 +48,7 @@ async function downloadGit(url: string, dest: string) {
   ])
 
   const execPath = path.join(dest, dir)
-  return execEnv(execPath)
+  return await execEnv(execPath)
 }
 
 async function downloadNpm(name: string, dest: string) {
@@ -59,7 +59,7 @@ async function downloadNpm(name: string, dest: string) {
   })
 
   const execPath = path.join(dest, 'package')
-  return execEnv(execPath)
+  return await execEnv(execPath)
 }
 
 export default async function download(url: string) {

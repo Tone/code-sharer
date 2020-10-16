@@ -3,7 +3,7 @@ import prompts, { PromptObject } from 'prompts'
 import path from 'path'
 import ora from 'ora'
 
-import { config, download } from '@tone./csm-utils'
+import { config, download, gitInit } from '@tone./csm-utils'
 
 export const command = 'init'
 export const describe = 'Init material storage'
@@ -47,6 +47,7 @@ export async function handler() {
     const dir = path.join(process.cwd(), name)
     spinner.text = 'init template...'
     await template.init(dir)
+    await gitInit(dir)
   } finally {
     spinner.stop()
   }

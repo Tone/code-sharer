@@ -13,3 +13,4 @@ jest.config.js
 *.config.js
 **/dist/*
 packages/csm-template-vue/**/*.js
+packages/csm-ui/server.js

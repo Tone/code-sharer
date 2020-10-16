@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('safe-require')('html-webpack-plugin')
 
 // const HtmlWebpackPlugin = require('safe-require')(webpack-html3')
 
-const execPath = path.join(process.cwd(), 'node_modules', '@tone./csm-ui')
+const execPath = path.dirname(require.resolve('@tone./csm-ui'))
 
 interface Options {
   port?: number,

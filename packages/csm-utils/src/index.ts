@@ -2,6 +2,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import os from 'os'
 import fg from 'fast-glob'
+import Git from 'simple-git/promise'
 
 export { default as download } from './download'
 
@@ -77,4 +78,8 @@ export async function copyByGlob(patterns: string[], dest: string, { cwd = proce
 
     return source
   }, [])
+}
+
+export async function gitInit(dir: string) {
+  return await Git(dir).init()
 }

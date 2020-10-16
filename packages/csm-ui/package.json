@@ -2,8 +2,10 @@
   "name": "@tone./csm-ui",
   "version": "1.0.0-beta.0",
   "files": [
-    ".next/**/*"
+    ".next/**/*",
+    "server.js"
   ],
+  "main": "server.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

@@ -56,7 +56,7 @@ var Generate = /** @class */ (function () {
                         return [4 /*yield*/, fs_extra_1.default.ensureDir(cwd)];
                     case 1:
                         _a.sent();
-                        vueCli = path_1.default.resolve(__dirname, '../../node_modules/.bin/vue');
+                        vueCli = require.resolve('@vue/cli/bin/vue');
                         preset = path_1.default.resolve(__dirname, './preset');
                         return [4 /*yield*/, execa_1.default('node', [vueCli, 'create', name, '--preset', preset], {
                                 cwd: cwd
