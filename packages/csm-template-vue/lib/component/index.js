@@ -42,6 +42,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var path_1 = __importDefault(require("path"));
 var execa_1 = __importDefault(require("execa"));
 var fs_extra_1 = __importDefault(require("fs-extra"));
+var npmRegistry = 'https://registry.npmjs.org';
 var Generate = /** @class */ (function () {
     function Generate() {
     }
@@ -58,7 +59,7 @@ var Generate = /** @class */ (function () {
                         _a.sent();
                         vueCli = require.resolve('@vue/cli/bin/vue');
                         preset = path_1.default.resolve(__dirname, './preset');
-                        return [4 /*yield*/, execa_1.default('node', [vueCli, 'create', name, '--preset', preset], {
+                        return [4 /*yield*/, execa_1.default('node', [vueCli, 'create', name, '--preset', preset, '-r', npmRegistry], {
                                 cwd: cwd
                             })];
                     case 2: return [2 /*return*/, _a.sent()];
