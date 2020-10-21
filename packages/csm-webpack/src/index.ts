@@ -76,7 +76,7 @@ function injectIframe(html: string, port: string) {
       box-shadow: 0 5px 12px 4px rgba(0, 0, 0, 0.09);
     }
   </style>
-  <iframe src="//localhost:${port}" frameborder="0"></iframe>
+  <iframe src="https://localhost:${port}" frameborder="0"></iframe>
   <script>
     var open = document.getElementsByClassName('csm_service__btn__open')[0]
     var close = document.getElementsByClassName('csm_service__btn__close')[0]

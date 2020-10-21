@@ -18,7 +18,7 @@ interface LeftSiderProps {
 function LeftSider({ menus, onSelect, defaultMenu }: LeftSiderProps) {
   const defaultSelectedKeys = [`${defaultMenu[0]}_${defaultMenu[1]}`]
 
-  return <div className={styles.left_sider}>
+  return <div>
     <h1 className={styles.name}>CSM</h1>
     <Menu theme="dark" mode="inline" defaultOpenKeys={[`${defaultMenu[0]}`]} defaultSelectedKeys={defaultSelectedKeys} onSelect={({ key }) => onSelect((key as string).split('_').map((key, index) => index === 0 ? +key : key))}>
       {menus.map(({ url, categories }, index) => (

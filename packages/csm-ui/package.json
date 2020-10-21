@@ -1,6 +1,6 @@
 {
   "name": "@tone./csm-ui",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "files": [
     ".next/**/*",
     "server.js"
@@ -20,14 +20,16 @@
     "access": "public"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.2.2",
     "@tone./csm-core": "^1.0.0-beta.1",
     "@tone./csm-utils": "^1.0.0-beta.1",
-    "antd": "^4.6.6",
+    "antd": "4.7.2",
     "fs-extra": "^9.0.1",
     "next": "9.5.3",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-syntax-highlighter": "^13.5.3",
+    "selfsigned": "^1.10.8",
     "swr": "^0.3.0"
   },
   "devDependencies": {
