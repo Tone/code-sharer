@@ -49,8 +49,9 @@ export default class Material {
     this.log = this.count()
   }
 
-  async create<T extends Template>(template: T, dir: string) {
-    if (await this.checkExist(dir)) throw new Error(`${dir} already exists`)
+  async create<T extends Template>(template: T, category: string, name: string) {
+    const dir = path.join(this.storage.dir, category, name)
+    if (await this.checkExist(category, name)) throw new Error(`${dir} already exists`)
     try {
       return await template.init(dir)
     } catch (e) {
@@ -59,9 +60,8 @@ export default class Material {
     }
   }
 
-  async checkExist(dir: string) {
-    await this.storage.fetch()
-    return fs.existsSync(path.join(this.storage.dir, dir))
+  checkExist(category: string, name: string) {
+    return this.find(category, name) !== null
   }
 
   async publish(info: MaterialInfo) {
@@ -152,10 +152,17 @@ export default class Material {
   }
 
   async update() {
-    const { behind } = await this.storage.status()
+    await this.storage.fetch()
+    const { behind, isClean } = await this.storage.status()
     if (behind > 0) {
+      if (!isClean) {
+        await this.storage.stash()
+      }
       await this.storage.pull()
       this.log = this.count()
+      if (!isClean) {
+        await this.storage.stashPop()
+      }
     }
   }
 

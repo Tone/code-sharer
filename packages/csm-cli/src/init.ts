@@ -37,7 +37,9 @@ export async function handler() {
   ]
 
   const { name, templateDir, curDir } = await prompts(questions)
+  if (name === undefined || templateDir === undefined) return
   if (curDir === false) return
+
   const spinner = ora('downloading template').start()
 
   try {

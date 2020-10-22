@@ -5,6 +5,8 @@ import Material from '@tone./csm-core'
 import { config } from '@tone./csm-utils'
 import ora from 'ora'
 
+import Err from './err'
+
 export const command = 'download'
 export const describe = 'Download material'
 
@@ -22,6 +24,10 @@ export async function handler(args: Arguments) {
     }
     storage = (await prompts(storageSelect)).storage
   }
+
+  if (storage === undefined) return
+  if (storage === '') throw new Err('parse storage in config')
+
   const spinner = ora('updating storage').start()
 
   const materialCenter = await Material.init(storage)
@@ -44,6 +50,8 @@ export async function handler(args: Arguments) {
   ]
 
   const { material, dir } = await prompts(searchMaterial)
+  if (material === undefined || dir === undefined) return
+
   spinner.text = `downloading ${material}`
   spinner.start()
   await materialCenter.download(material, path.resolve(process.cwd(), dir))

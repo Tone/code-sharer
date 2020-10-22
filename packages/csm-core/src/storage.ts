@@ -113,7 +113,16 @@ export default class Storage {
   }
 
   async status() {
-    return await this.repository.status()
+    const status = await this.repository.status()
+    return { ...status, isClean: status.isClean() }
+  }
+
+  async stash() {
+    return await this.repository.stash()
+  }
+
+  async stashPop() {
+    return await this.repository.stash(['pop'])
   }
 
   async branch(name: string, remote = REMOTE_NAME) {

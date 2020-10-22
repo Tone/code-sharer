@@ -28,10 +28,12 @@ function templates(categories: Record<string, string>) {
 export async function handler(args: Arguments) {
   const dir = process.cwd()
   const material = await Material.init(dir)
-  const config = material.config(dir)
+  await material.update()
 
+  const config = material.config(dir)
   const { categories, templateUrl } = config
   const categoryChoices = templates(categories)
+  const defaultTemplate = categoryChoices[0].value
 
   const questions: PromptObject[] = [
     {
@@ -45,18 +47,20 @@ export async function handler(args: Arguments) {
       type: 'text',
       name: 'name',
       message: 'Please input material name',
-      validate: async (val, prev) => {
-        let dir = val
+      validate: (name, prev) => {
+        let category = defaultTemplate.name
         if (prev?.template !== undefined) {
-          dir = `${prev.template.name}/${val}`
+          category = prev.template.name
         }
-        const exist: boolean = await material.checkExist(dir)
-        return exist ? `${val} already exists` : true
+        const exist: boolean = material.checkExist(category, name)
+        return exist ? `${category} ${name} already exists` : true
       }
     }
   ]
 
-  const { name, template = categoryChoices[0].value } = await prompts(questions)
+  const { name, template = defaultTemplate } = await prompts(questions)
+
+  if (name === undefined || template === undefined) return
   const spinner = ora('downloading template').start()
 
   try {
@@ -72,7 +76,7 @@ export async function handler(args: Arguments) {
     spinner.text = 'create material'
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { default: templateExec } = require(templateExecFile)
-    const out = await material.create(templateExec, path.resolve(dir, template.name, name))
+    const out = await material.create(templateExec, template.name, name)
     console.log(typeof out === 'string' ? out : out?.stdout)
   } finally {
     spinner.stop()

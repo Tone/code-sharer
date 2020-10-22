@@ -5,6 +5,8 @@ import ora from 'ora'
 import Material from '@tone./csm-core'
 import { config } from '@tone./csm-utils'
 
+import Err from './err'
+
 export const command = 'search'
 export const describe = 'Search material'
 
@@ -23,6 +25,10 @@ export async function handler() {
     }
     storage = await prompts(storageSelect)
   }
+
+  if (storage === undefined) return
+  if (storage === '') throw new Err('parse storage in config')
+
   const spinner = ora('updating storage').start()
 
   const materialCenter = await Material.init(storage)
