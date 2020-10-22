@@ -101,7 +101,7 @@ function IndexPage({ repos, project }: IndexPageProps) {
       </Sider>
       <Layout className={styles.layout}>
         <Header className={styles.head}>
-          <Row justify="end" gutter={16}>
+          <Row justify="end" gutter={16} align="middle">
             <Col>
               <Search ref={inputRef} placeholder="Please Search Keywords" allowClear prefix={<SearchOutlined />} onSearch={(input) => setSearch(input)} />
             </Col>
